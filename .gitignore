@@ -1,5 +1,6 @@
 /.godot/
 *.import
 *.uid
+*.md
 .DS_Store
 Thumbs.db

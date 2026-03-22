@@ -1,4 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://c6oudjtqmx4dm"]
+[gd_scene load_steps=6 format=3 uid="uid://c6oudjtqmx4dm"]
+
+[ext_resource type="Script" path="res://scripts/auditor_screen.gd" id="1_yoo1g"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.992157, 0.964706, 0.890196, 1)
@@ -21,6 +23,8 @@ grow_begin = 2.0
 grow_end = 2.0
 
 [node name="AuditorScreen" type="CanvasLayer"]
+visible = false
+script = ExtResource("1_yoo1g")
 
 [node name="Overlay" type="Control" parent="."]
 layout_mode = 3

@@ -1,4 +1,6 @@
-[gd_scene load_steps=8 format=3 uid="uid://clugx22w6fw04"]
+[gd_scene load_steps=9 format=3 uid="uid://clugx22w6fw04"]
+
+[ext_resource type="Script" path="res://scripts/morning_brief.gd" id="1_sgv7q"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.992157, 0.964706, 0.890196, 1)
@@ -57,6 +59,7 @@ content_margin_right = 8.0
 content_margin_bottom = 4.0
 
 [node name="MorningBrief" type="CanvasLayer"]
+script = ExtResource("1_sgv7q")
 
 [node name="Overlay" type="Control" parent="."]
 layout_mode = 3

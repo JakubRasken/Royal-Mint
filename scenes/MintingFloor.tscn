@@ -1,9 +1,11 @@
-[gd_scene load_steps=12 format=3 uid="uid://g6xarrsdlss3"]
+[gd_scene load_steps=15 format=3 uid="uid://g6xarrsdlss3"]
 
 [ext_resource type="PackedScene" path="res://scenes/PipelineStageSlot.tscn" id="1_stage"]
 [ext_resource type="PackedScene" path="res://scenes/LedgerPanel.tscn" id="2_ledger"]
 [ext_resource type="PackedScene" path="res://scenes/WorkerRoster.tscn" id="3_roster"]
 [ext_resource type="PackedScene" path="res://scenes/MorningBrief.tscn" id="4_brief"]
+[ext_resource type="PackedScene" path="res://scenes/AuditorScreen.tscn" id="5_audit"]
+[ext_resource type="Script" path="res://scripts/minting_floor.gd" id="6_floor"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
 bg_color = Color(0.960784, 0.901961, 0.698039, 1)
@@ -48,6 +50,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("6_floor")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
@@ -129,3 +132,5 @@ text = "Advance to next day"
 
 [node name="MorningBrief" parent="." instance=ExtResource("4_brief")]
 visible = false
+
+[node name="AuditorScreen" parent="." instance=ExtResource("5_audit")]

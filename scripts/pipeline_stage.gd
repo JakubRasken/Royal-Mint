@@ -2,6 +2,7 @@
 # isolated from the global day-flow systems and be instanced by MintingFloor.
 extends PanelContainer
 
+signal assignment_requested(stage_id: String)
 signal worker_assigned(stage_id: String, worker: Worker)
 signal worker_removed(stage_id: String)
 
@@ -49,13 +50,17 @@ func set_output_preview(estimated_coins: int) -> void:
     _output_label.text = "~%d coins / shift" % maxi(estimated_coins, 0)
 
 
+func get_assigned_worker() -> Worker:
+    return _assigned_worker
+
+
 func _refresh_display() -> void:
     _stage_name_label.text = stage_name
 
     if _assigned_worker == null:
         _worker_name_label.text = EMPTY_WORKER_NAME
         _assign_button.text = ASSIGN_BUTTON_TEXT
-        _assign_button.disabled = true
+        _assign_button.disabled = false
         _output_label.text = EMPTY_OUTPUT_TEXT
         _fatigue_bar.value = 0
         return
@@ -69,3 +74,6 @@ func _refresh_display() -> void:
 func _on_assign_button_pressed() -> void:
     if _assigned_worker != null:
         remove_worker()
+        return
+
+    assignment_requested.emit(stage_id)

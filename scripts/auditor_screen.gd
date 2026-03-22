@@ -18,7 +18,14 @@ func show_result(ending_id: String, snapshot: Dictionary) -> void:
         return
 
     _result_title.text = "Royal auditor's report - Failed"
+    if not bool(snapshot["ledger_clean"]):
+        _result_summary.text = (
+            "The auditor rejects your work. Quota stands at %d / %d, and the "
+            + "ledger carries the stain of irregular minting."
+        ) % [int(snapshot["cumulative_output"]), int(snapshot["cumulative_target"])]
+        return
+
     _result_summary.text = (
-        "The auditor rejects your work. Quota stands at %d / %d, and the "
-        + "ledger carries the stain of irregular minting."
+        "The auditor rejects your work. Quota stands at %d / %d, and the Crown "
+        + "finds your output wanting even if the books remain clean."
     ) % [int(snapshot["cumulative_output"]), int(snapshot["cumulative_target"])]

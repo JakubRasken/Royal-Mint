@@ -13,8 +13,12 @@ choice_a_label = "Accept the bribe"
 choice_b_label = "Refuse the demand"
 choice_a_effect = {
 "accepts_sigismund_bribe": true,
+"balance_delta": 18,
 "ledger_flag": "sigismund_bribe_accepted"
 }
 choice_b_effect = {
-"accepts_sigismund_bribe": false
+"accepts_sigismund_bribe": false,
+"worker_loyalty_delta": {
+"Jiri": -15
+}
 }

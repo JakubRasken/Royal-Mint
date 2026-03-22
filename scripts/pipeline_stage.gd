@@ -10,6 +10,8 @@ const EMPTY_WORKER_NAME: String = "Unassigned"
 const EMPTY_OUTPUT_TEXT: String = "~0 coins / shift"
 const REMOVE_BUTTON_TEXT: String = "Remove"
 const ASSIGN_BUTTON_TEXT: String = "Assign"
+const PICK_WORKER_TEXT: String = "Pick worker"
+const ACTIVE_STAGE_MODULATE: Color = Color(1.0, 0.9725, 0.8902, 1.0)
 
 @export var stage_id: String = "smelting"
 @export var stage_name: String = "Smelting"
@@ -21,6 +23,7 @@ const ASSIGN_BUTTON_TEXT: String = "Assign"
 @onready var _fatigue_bar: ProgressBar = %FatigueBar
 
 var _assigned_worker: Worker
+var _assignment_pending: bool = false
 
 
 func _ready() -> void:
@@ -50,6 +53,11 @@ func set_output_preview(estimated_coins: int) -> void:
     _output_label.text = "~%d coins / shift" % maxi(estimated_coins, 0)
 
 
+func set_assignment_pending(is_pending: bool) -> void:
+    _assignment_pending = is_pending
+    _refresh_display()
+
+
 func get_assigned_worker() -> Worker:
     return _assigned_worker
 
@@ -59,16 +67,18 @@ func _refresh_display() -> void:
 
     if _assigned_worker == null:
         _worker_name_label.text = EMPTY_WORKER_NAME
-        _assign_button.text = ASSIGN_BUTTON_TEXT
+        _assign_button.text = PICK_WORKER_TEXT if _assignment_pending else ASSIGN_BUTTON_TEXT
         _assign_button.disabled = false
-        _output_label.text = EMPTY_OUTPUT_TEXT
+        _output_label.text = "Select a worker from the roster" if _assignment_pending else EMPTY_OUTPUT_TEXT
         _fatigue_bar.value = 0
+        self_modulate = ACTIVE_STAGE_MODULATE if _assignment_pending else Color(1, 1, 1, 1)
         return
 
     _worker_name_label.text = _assigned_worker.worker_name
     _assign_button.text = REMOVE_BUTTON_TEXT
     _assign_button.disabled = false
     _fatigue_bar.value = _assigned_worker.fatigue
+    self_modulate = Color(1, 1, 1, 1)
 
 
 func _on_assign_button_pressed() -> void:

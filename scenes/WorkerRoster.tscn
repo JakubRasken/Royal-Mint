@@ -120,6 +120,11 @@ theme_override_colors/font_color = Color(0.133333, 0.133333, 0.133333, 1)
 theme_override_font_sizes/font_size = 15
 text = "Radek - Smelter"
 
+[node name="StatusLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Radek/InfoColumn"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Waiting in the roster"
+
 [node name="StatsRow" type="HBoxContainer" parent="VBoxContainer/WorkerList/WorkerRow_Radek/InfoColumn"]
 layout_mode = 2
 theme_override_constants/separation = 10
@@ -174,6 +179,11 @@ theme_override_colors/font_color = Color(0.133333, 0.133333, 0.133333, 1)
 theme_override_font_sizes/font_size = 15
 text = "Bozena - Assayer"
 
+[node name="StatusLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Bozena/InfoColumn"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Waiting in the roster"
+
 [node name="StatsRow" type="HBoxContainer" parent="VBoxContainer/WorkerList/WorkerRow_Bozena/InfoColumn"]
 layout_mode = 2
 theme_override_constants/separation = 10
@@ -227,6 +237,11 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.133333, 0.133333, 0.133333, 1)
 theme_override_font_sizes/font_size = 15
 text = "Jiri - Pressman"
+
+[node name="StatusLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Jiri/InfoColumn"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Waiting in the roster"
 
 [node name="StatsRow" type="HBoxContainer" parent="VBoxContainer/WorkerList/WorkerRow_Jiri/InfoColumn"]
 layout_mode = 2

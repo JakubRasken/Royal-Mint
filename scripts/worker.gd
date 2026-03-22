@@ -19,6 +19,10 @@ func apply_shift_fatigue() -> void:
     fatigue = clampi(fatigue + SHIFT_FATIGUE_GAIN, 0, MAX_FATIGUE)
 
 
+func apply_loyalty_delta(amount: int) -> void:
+    loyalty = clampi(loyalty + amount, 0, 100)
+
+
 func mark_rest_day() -> void:
     is_resting = true
 

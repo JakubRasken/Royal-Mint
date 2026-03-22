@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://g6xarrsdlss3"]
+[gd_scene load_steps=17 format=3 uid="uid://g6xarrsdlss3"]
 
 [ext_resource type="PackedScene" path="res://scenes/PipelineStageSlot.tscn" id="1_stage"]
 [ext_resource type="PackedScene" path="res://scenes/LedgerPanel.tscn" id="2_ledger"]
@@ -42,6 +42,26 @@ content_margin_left = 10.0
 content_margin_top = 6.0
 content_margin_right = 10.0
 content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.992157, 0.964706, 0.890196, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.545098, 0.411765, 0.0784314, 1)
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+shadow_color = Color(0.164706, 0.101961, 0.00784314, 0.35)
+shadow_size = 2
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_separator"]
+color = Color(0.545098, 0.411765, 0.0784314, 1)
+thickness = 2
+grow_begin = 2.0
+grow_end = 2.0
 
 [node name="MintingFloor" type="Control"]
 layout_mode = 3
@@ -97,6 +117,39 @@ stage_name = "Striking"
 layout_mode = 2
 stage_id = "assay"
 stage_name = "Assay"
+
+[node name="ShiftReportPanel" type="PanelContainer" parent="HBoxContainer/LeftPanel"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/LeftPanel/ShiftReportPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ShiftReportTitle" type="Label" parent="HBoxContainer/LeftPanel/ShiftReportPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_font_sizes/font_size = 18
+text = "Shift report"
+
+[node name="HSeparator" type="HSeparator" parent="HBoxContainer/LeftPanel/ShiftReportPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxLine_separator")
+
+[node name="ShiftReportSummary" type="Label" parent="HBoxContainer/LeftPanel/ShiftReportPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.133333, 0.133333, 0.133333, 1)
+theme_override_font_sizes/font_size = 15
+text = "No shift completed yet."
+autowrap_mode = 3
+
+[node name="ShiftReportDetail" type="Label" parent="HBoxContainer/LeftPanel/ShiftReportPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Assign the floor and prepare the day's output."
+autowrap_mode = 3
 
 [node name="RightPanel" type="VBoxContainer" parent="HBoxContainer"]
 layout_mode = 2

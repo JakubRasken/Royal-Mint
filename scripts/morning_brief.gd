@@ -29,6 +29,7 @@ func show_brief(day_num: int, active_event: GameEvent) -> void:
             + "the dies true, and the ledger clean before the Crown looks closer."
         ) % day_num
         _choice_row.visible = false
+        _begin_shift_button.disabled = false
         return
 
     _brief_title.text = active_event.title
@@ -38,12 +39,17 @@ func show_brief(day_num: int, active_event: GameEvent) -> void:
     _choice_b_button.text = active_event.choice_b_label
     _choice_a_button.disabled = false
     _choice_b_button.disabled = false
+    _begin_shift_button.disabled = true
 
 
-func resolve_choice(choice_id: String) -> void:
-    _narrative_label.text += "\n\nChoice recorded for this day: %s." % choice_id
+func resolve_choice(choice_id: String, resolution_summary: String = "") -> void:
+    if resolution_summary.is_empty():
+        _narrative_label.text += "\n\nChoice recorded for this day: %s." % choice_id
+    else:
+        _narrative_label.text += "\n\n" + resolution_summary
     _choice_a_button.disabled = true
     _choice_b_button.disabled = true
+    _begin_shift_button.disabled = false
 
 
 func hide_brief() -> void:

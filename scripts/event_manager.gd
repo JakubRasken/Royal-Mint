@@ -78,3 +78,17 @@ func _apply_effects(effects: Dictionary) -> void:
 
     if effects.has("ledger_flag"):
         Ledger.record_integrity_issue(String(effects["ledger_flag"]))
+
+    if effects.has("worker_loyalty_delta"):
+        var loyalty_delta: Dictionary = effects["worker_loyalty_delta"] as Dictionary
+        for worker_name: Variant in loyalty_delta.keys():
+            var worker: Worker = _find_worker_by_name(String(worker_name))
+            if worker != null:
+                worker.apply_loyalty_delta(int(loyalty_delta[worker_name]))
+
+
+func _find_worker_by_name(worker_name: String) -> Worker:
+    for worker: Worker in GameManager.workers:
+        if worker.worker_name == worker_name:
+            return worker
+    return null

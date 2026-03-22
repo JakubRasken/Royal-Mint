@@ -35,6 +35,7 @@ const FATIGUE_HIGH_COLOR: Color = Color(0.5451, 0.1020, 0.1020, 1.0)
 
 var _assigned_worker: Worker
 var _assignment_pending: bool = false
+var _support_preview_output: int = 0
 
 
 func _ready() -> void:
@@ -64,6 +65,12 @@ func set_output_preview(estimated_coins: int) -> void:
     _output_label.text = "~%d coins / shift" % maxi(estimated_coins, 0)
 
 
+func set_support_preview(estimated_coins: int) -> void:
+    _support_preview_output = maxi(estimated_coins, 0)
+    if _assigned_worker == null:
+        _refresh_display()
+
+
 func set_assignment_pending(is_pending: bool) -> void:
     _assignment_pending = is_pending
     _refresh_display()
@@ -84,7 +91,12 @@ func _refresh_display() -> void:
         _worker_name_label.text = EMPTY_WORKER_NAME
         _assign_button.text = PICK_WORKER_TEXT if _assignment_pending else ASSIGN_BUTTON_TEXT
         _assign_button.disabled = false
-        _output_label.text = "Select a worker from the roster" if _assignment_pending else EMPTY_OUTPUT_TEXT
+        if _assignment_pending:
+            _output_label.text = "Select a worker from the roster"
+        elif _support_preview_output > 0:
+            _output_label.text = "~%d coins / shift with floor hands" % _support_preview_output
+        else:
+            _output_label.text = EMPTY_OUTPUT_TEXT
         _update_fatigue_display(0)
         self_modulate = ACTIVE_STAGE_MODULATE if _assignment_pending else Color(1, 1, 1, 1)
         return

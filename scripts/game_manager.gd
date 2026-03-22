@@ -66,7 +66,7 @@ func complete_shift(results: Dictionary) -> void:
     var total_output: int = int(results.get("total_output", 0))
     Ledger.set_daily_output(merchant_grade_output)
 
-    if total_output <= 0:
+    if merchant_grade_output <= 0:
         _consecutive_zero_output_days += 1
     else:
         _consecutive_zero_output_days = 0
@@ -115,6 +115,11 @@ func evaluate_worker_collapse() -> void:
     _trigger_immediate_failure("workers_incapacitated")
 
 
+func evaluate_balance_failure() -> void:
+    if Ledger.is_bankrupt():
+        _trigger_immediate_failure("ledger_bankrupt")
+
+
 func _start_day(day_num: int) -> void:
     current_day = day_num
     current_phase = GamePhase.MORNING_BRIEF
@@ -139,6 +144,9 @@ func _run_audit() -> void:
 
 
 func _trigger_immediate_failure(ending_id: String) -> void:
+    if current_phase == GamePhase.COMPLETE:
+        return
+
     last_ending_id = ending_id
     current_phase = GamePhase.COMPLETE
     game_over.emit(ending_id)

@@ -8,9 +8,14 @@ const ROLE_BY_STAGE: Dictionary = {
     "assay": "Assayer"
 }
 const GROSCHEN_VALUE_PER_MERCHANT_COIN: int = 1
-const QUALITY_BASE_SCORE: float = 35.0
+const BASE_OUTPUT_PER_SKILL: float = 12.0
+const OUTPUT_FATIGUE_PENALTY: float = 0.55
+const FLOOR_HAND_OUTPUT: int = 10
+const FLOOR_HAND_QUALITY: float = 50.0
+const FLOOR_HAND_MERCHANT_FACTOR: float = 0.4
+const QUALITY_BASE_SCORE: float = 40.0
 const QUALITY_SKILL_WEIGHT: float = 15.0
-const QUALITY_FATIGUE_PENALTY: float = 0.35
+const QUALITY_FATIGUE_PENALTY: float = 0.15
 
 @onready var _stage_nodes: Dictionary = {
     "smelting": $"HBoxContainer/LeftPanel/StageContainer/PipelineStage_Smelting",
@@ -153,12 +158,14 @@ func _complete_current_shift() -> void:
     _pending_stage_id = ""
     var stage_outputs: Array[int] = []
     var quality_scores: Array[float] = []
+    var floor_hands_used: int = 0
 
     for stage_id: String in ROLE_BY_STAGE.keys():
         var worker: Worker = GameManager.stage_assignments.get(stage_id) as Worker
         if worker == null:
-            stage_outputs.append(0)
-            quality_scores.append(0.0)
+            stage_outputs.append(FLOOR_HAND_OUTPUT)
+            quality_scores.append(FLOOR_HAND_QUALITY)
+            floor_hands_used += 1
             continue
 
         var output: int = _calculate_worker_output(worker)
@@ -173,20 +180,35 @@ func _complete_current_shift() -> void:
         average_quality /= quality_scores.size()
 
     var quality_grade: String = _quality_grade_from_score(average_quality)
-    var merchant_or_better: int = total_output if average_quality >= 65.0 else 0
+    var merchant_or_better: int = 0
+    if average_quality >= 65.0:
+        merchant_or_better = total_output if floor_hands_used == 0 else int(floor(float(total_output) * FLOOR_HAND_MERCHANT_FACTOR))
 
-    Ledger.add_income(merchant_or_better * GROSCHEN_VALUE_PER_MERCHANT_COIN)
+    var income_earned: int = merchant_or_better * GROSCHEN_VALUE_PER_MERCHANT_COIN
+    Ledger.add_income(income_earned)
+    var wages_paid: int = Ledger.apply_daily_wages(GameManager.workers)
     GameManager.complete_shift({
         "total_output": total_output,
         "merchant_grade_or_better": merchant_or_better,
-        "quality_grade": quality_grade
+        "quality_grade": quality_grade,
+        "floor_hands_used": floor_hands_used,
+        "income_earned": income_earned,
+        "wages_paid": wages_paid,
+        "net_result": income_earned - wages_paid
     })
 
     if GameManager.current_phase == GameManager.GamePhase.COMPLETE:
         return
 
+    GameManager.evaluate_balance_failure()
+    if GameManager.current_phase == GameManager.GamePhase.COMPLETE:
+        return
+
     _apply_end_of_day_worker_updates()
     GameManager.evaluate_worker_collapse()
+    if GameManager.current_phase == GameManager.GamePhase.COMPLETE:
+        return
+
     _refresh_stage_previews()
     _worker_roster.refresh()
 
@@ -207,11 +229,12 @@ func _refresh_stage_previews() -> void:
         var stage_node = _stage_nodes[stage_id]
         var worker: Worker = GameManager.stage_assignments.get(stage_id) as Worker
         if worker == null:
-            stage_node.set_output_preview(0)
+            stage_node.set_support_preview(FLOOR_HAND_OUTPUT)
             if stage_node.get_assigned_worker() != null:
                 stage_node.remove_worker()
             continue
 
+        stage_node.set_support_preview(0)
         if stage_node.get_assigned_worker() != worker:
             stage_node.assign_worker(worker)
         else:
@@ -230,9 +253,12 @@ func _find_stage_for_worker(worker: Worker) -> String:
 
 
 func _calculate_worker_output(worker: Worker) -> int:
-    var base_output: float = float(worker.skill * 10)
+    if worker.is_incapacitated():
+        return 0
+
+    var base_output: float = float(worker.skill) * BASE_OUTPUT_PER_SKILL
     var fatigue_penalty: float = float(worker.fatigue) / 100.0
-    return maxi(int(round(base_output * (1.0 - fatigue_penalty * 0.7))), 0)
+    return maxi(int(round(base_output * (1.0 - fatigue_penalty * OUTPUT_FATIGUE_PENALTY))), 0)
 
 
 func _calculate_worker_quality(worker: Worker) -> float:
@@ -316,14 +342,24 @@ func _show_shift_report(results: Dictionary) -> void:
     var merchant_output: int = int(results.get("merchant_grade_or_better", 0))
     var quality_grade: String = String(results.get("quality_grade", "Debased"))
     var quota_met: bool = Ledger.did_meet_daily_quota()
+    var floor_hands_used: int = int(results.get("floor_hands_used", 0))
+    var wages_paid: int = int(results.get("wages_paid", 0))
+    var net_result: int = int(results.get("net_result", 0))
 
     _shift_report_title.text = "Evening report - Day %d" % GameManager.current_day
     _shift_report_summary.text = (
         "%d coins struck. %d counted toward quota at %s grade."
     ) % [total_output, merchant_output, quality_grade]
-    _shift_report_detail.text = (
-        "Quota %s. Balance stands at %d groschen."
-    ) % ["met" if quota_met else "unmet", Ledger.get_balance()]
+
+    var report_parts: Array[String] = [
+        "Quota %s." % ("met" if quota_met else "unmet"),
+        "Wages cost %d groschen." % wages_paid,
+        "Net %s%d." % ["+" if net_result >= 0 else "-", abs(net_result)],
+        "Balance stands at %d groschen." % Ledger.get_balance()
+    ]
+    if floor_hands_used > 0:
+        report_parts.insert(1, "Floor hands covered %d stage(s)." % floor_hands_used)
+    _shift_report_detail.text = " ".join(report_parts)
 
 
 func _update_header_day(day_num: int) -> void:

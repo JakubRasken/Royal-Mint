@@ -5,13 +5,17 @@ extends Node
 signal quota_updated(current: int, target: int)
 signal balance_changed(amount: int)
 
-const QUOTA_DAYS_1_TO_4: int = 20
-const QUOTA_DAYS_5_TO_9: int = 30
-const QUOTA_DAYS_10_TO_14: int = 40
+const QUOTA_DAYS_1_TO_4: int = 14
+const QUOTA_DAYS_5_TO_9: int = 15
+const QUOTA_DAYS_10_TO_14: int = 16
+const STARTING_BALANCE: int = 24
+const DAILY_WAGE_BY_ROLE: Dictionary = {
+    "Smelter": 3,
+    "Assayer": 3,
+    "Pressman": 2
+}
 
-# QUESTION: The GDD does not define a starting balance or wage values yet, so
-# the ledger defaults to zero balance until those numbers are specified.
-var _balance: int = 0
+var _balance: int = STARTING_BALANCE
 var _current_day: int = 0
 var _current_quota_target: int = 0
 var _current_merchant_output: int = 0
@@ -20,7 +24,7 @@ var _cumulative_merchant_output: int = 0
 var _integrity_flags: Array[String] = []
 
 
-func reset(starting_balance: int = 0) -> void:
+func reset(starting_balance: int = STARTING_BALANCE) -> void:
     _balance = starting_balance
     _current_day = 0
     _current_quota_target = 0
@@ -62,6 +66,19 @@ func subtract_expense(amount: int) -> void:
     _set_balance(_balance - maxi(amount, 0))
 
 
+func apply_daily_wages(workers: Array[Worker]) -> int:
+    var total_wages: int = get_daily_wage_total(workers)
+    subtract_expense(total_wages)
+    return total_wages
+
+
+func get_daily_wage_total(workers: Array[Worker]) -> int:
+    var total_wages: int = 0
+    for worker: Worker in workers:
+        total_wages += int(DAILY_WAGE_BY_ROLE.get(worker.role, 2))
+    return total_wages
+
+
 func record_integrity_issue(flag_id: String) -> void:
     if flag_id.is_empty():
         return
@@ -77,6 +94,10 @@ func get_balance() -> int:
     return _balance
 
 
+func is_bankrupt() -> bool:
+    return _balance <= 0
+
+
 func did_meet_daily_quota() -> bool:
     return _current_merchant_output >= _current_quota_target
 
@@ -89,6 +110,7 @@ func get_audit_snapshot() -> Dictionary:
     return {
         "day": _current_day,
         "balance": _balance,
+        "daily_wages": get_daily_wage_total(GameManager.workers),
         "daily_output": _current_merchant_output,
         "daily_target": _current_quota_target,
         "cumulative_output": _cumulative_merchant_output,

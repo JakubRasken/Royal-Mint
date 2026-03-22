@@ -8,6 +8,7 @@ signal game_over(ending_id: String)
 
 const FIRST_DAY: int = 1
 const FINAL_DAY: int = 14
+const ZERO_OUTPUT_FAILURE_THRESHOLD: int = 3
 
 enum GamePhase {
     NOT_STARTED,
@@ -62,14 +63,18 @@ func complete_shift(results: Dictionary) -> void:
     current_phase = GamePhase.EVENING_REPORT
 
     var merchant_grade_output: int = int(results.get("merchant_grade_or_better", 0))
+    var total_output: int = int(results.get("total_output", 0))
     Ledger.set_daily_output(merchant_grade_output)
 
-    if merchant_grade_output <= 0:
+    if total_output <= 0:
         _consecutive_zero_output_days += 1
     else:
         _consecutive_zero_output_days = 0
 
     day_ended.emit(_last_shift_results.duplicate(true))
+
+    if _consecutive_zero_output_days >= ZERO_OUTPUT_FAILURE_THRESHOLD:
+        _trigger_immediate_failure("zero_output_collapse")
 
 
 func advance_day() -> void:
@@ -117,6 +122,12 @@ func _run_audit() -> void:
     var ledger_clean: bool = Ledger.has_clean_ledger()
     var ending_id: String = "audit_pass" if quota_passed and ledger_clean else "audit_fail"
 
+    last_ending_id = ending_id
+    current_phase = GamePhase.COMPLETE
+    game_over.emit(ending_id)
+
+
+func _trigger_immediate_failure(ending_id: String) -> void:
     last_ending_id = ending_id
     current_phase = GamePhase.COMPLETE
     game_over.emit(ending_id)

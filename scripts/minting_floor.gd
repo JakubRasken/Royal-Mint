@@ -8,6 +8,9 @@ const ROLE_BY_STAGE: Dictionary = {
     "assay": "Assayer"
 }
 const GROSCHEN_VALUE_PER_MERCHANT_COIN: int = 1
+const QUALITY_BASE_SCORE: float = 35.0
+const QUALITY_SKILL_WEIGHT: float = 15.0
+const QUALITY_FATIGUE_PENALTY: float = 0.35
 
 @onready var _stage_nodes: Dictionary = {
     "smelting": $"HBoxContainer/LeftPanel/StageContainer/PipelineStage_Smelting",
@@ -233,7 +236,11 @@ func _calculate_worker_output(worker: Worker) -> int:
 
 
 func _calculate_worker_quality(worker: Worker) -> float:
-    return clampf(float(worker.skill * 20) - float(worker.fatigue) * 0.5, 0.0, 100.0)
+    return clampf(
+        QUALITY_BASE_SCORE + float(worker.skill) * QUALITY_SKILL_WEIGHT - float(worker.fatigue) * QUALITY_FATIGUE_PENALTY,
+        0.0,
+        100.0
+    )
 
 
 func _quality_grade_from_score(score: float) -> String:

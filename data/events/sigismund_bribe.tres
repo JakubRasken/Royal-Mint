@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="GameEvent" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/game_event.gd" id="1_88qes"]
+
+[resource]
+script = ExtResource("1_88qes")
+event_id = "sigismund_bribe"
+day_trigger = -1
+trigger_days = PackedInt32Array(3, 7, 11)
+title = "Sigismund's agent"
+narrative = "A nobleman bearing Sigismund's seal requests off-book groschen struck after dark and omitted from the ledger."
+choice_a_label = "Accept the bribe"
+choice_b_label = "Refuse the demand"
+choice_a_effect = {
+"accepts_sigismund_bribe": true,
+"ledger_flag": "sigismund_bribe_accepted"
+}
+choice_b_effect = {
+"accepts_sigismund_bribe": false
+}

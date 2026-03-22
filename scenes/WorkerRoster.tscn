@@ -1,0 +1,257 @@
+[gd_scene load_steps=10 format=3 uid="uid://cbp2lu5dg61b3"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.992157, 0.964706, 0.890196, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.545098, 0.411765, 0.0784314, 1)
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+shadow_color = Color(0.164706, 0.101961, 0.00784314, 0.35)
+shadow_size = 2
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_separator"]
+color = Color(0.545098, 0.411765, 0.0784314, 1)
+thickness = 2
+grow_begin = 2.0
+grow_end = 2.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
+bg_color = Color(0.960784, 0.901961, 0.698039, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.545098, 0.411765, 0.0784314, 1)
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_hover"]
+bg_color = Color(0.960784, 0.901961, 0.698039, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.360784, 0.266667, 0.0352941, 1)
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_pressed"]
+bg_color = Color(0.545098, 0.411765, 0.0784314, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.360784, 0.266667, 0.0352941, 1)
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_focus"]
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.545098, 0.411765, 0.0784314, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_texture"]
+
+[node name="WorkerRoster" type="PanelContainer"]
+custom_minimum_size = Vector2(360, 280)
+anchors_preset = 10
+anchor_right = 1.0
+offset_right = 0.0
+offset_bottom = 280.0
+grow_horizontal = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RosterTitle" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_font_sizes/font_size = 20
+text = "Workers"
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxLine_separator")
+
+[node name="WorkerList" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="WorkerRow_Radek" type="HBoxContainer" parent="VBoxContainer/WorkerList"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Portrait" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Radek"]
+layout_mode = 2
+custom_minimum_size = Vector2(64, 64)
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+theme_override_styles/texture_normal = SubResource("StyleBoxEmpty_texture")
+
+[node name="InfoColumn" type="VBoxContainer" parent="VBoxContainer/WorkerList/WorkerRow_Radek"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="NameLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Radek/InfoColumn"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.133333, 0.133333, 0.133333, 1)
+theme_override_font_sizes/font_size = 15
+text = "Radek - Smelter"
+
+[node name="StatsRow" type="HBoxContainer" parent="VBoxContainer/WorkerList/WorkerRow_Radek/InfoColumn"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SkillLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Radek/InfoColumn/StatsRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Skill 4"
+
+[node name="FatigueLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Radek/InfoColumn/StatsRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Fatigue 0"
+
+[node name="LoyaltyLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Radek/InfoColumn/StatsRow"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Loyalty 95"
+
+[node name="RestDayButton" type="Button" parent="VBoxContainer/WorkerList/WorkerRow_Radek"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_colors/font_hover_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_colors/font_pressed_color = Color(0.992157, 0.964706, 0.890196, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_button_focus")
+text = "Rest today"
+
+[node name="WorkerRow_Bozena" type="HBoxContainer" parent="VBoxContainer/WorkerList"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Portrait" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Bozena"]
+layout_mode = 2
+custom_minimum_size = Vector2(64, 64)
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+theme_override_styles/texture_normal = SubResource("StyleBoxEmpty_texture")
+
+[node name="InfoColumn" type="VBoxContainer" parent="VBoxContainer/WorkerList/WorkerRow_Bozena"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="NameLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Bozena/InfoColumn"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.133333, 0.133333, 0.133333, 1)
+theme_override_font_sizes/font_size = 15
+text = "Bozena - Assayer"
+
+[node name="StatsRow" type="HBoxContainer" parent="VBoxContainer/WorkerList/WorkerRow_Bozena/InfoColumn"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SkillLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Bozena/InfoColumn/StatsRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Skill 3"
+
+[node name="FatigueLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Bozena/InfoColumn/StatsRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Fatigue 0"
+
+[node name="LoyaltyLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Bozena/InfoColumn/StatsRow"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Loyalty 80"
+
+[node name="RestDayButton" type="Button" parent="VBoxContainer/WorkerList/WorkerRow_Bozena"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_colors/font_hover_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_colors/font_pressed_color = Color(0.992157, 0.964706, 0.890196, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_button_focus")
+text = "Rest today"
+
+[node name="WorkerRow_Jiri" type="HBoxContainer" parent="VBoxContainer/WorkerList"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Portrait" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Jiri"]
+layout_mode = 2
+custom_minimum_size = Vector2(64, 64)
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+theme_override_styles/texture_normal = SubResource("StyleBoxEmpty_texture")
+
+[node name="InfoColumn" type="VBoxContainer" parent="VBoxContainer/WorkerList/WorkerRow_Jiri"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="NameLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Jiri/InfoColumn"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.133333, 0.133333, 0.133333, 1)
+theme_override_font_sizes/font_size = 15
+text = "Jiri - Pressman"
+
+[node name="StatsRow" type="HBoxContainer" parent="VBoxContainer/WorkerList/WorkerRow_Jiri/InfoColumn"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SkillLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Jiri/InfoColumn/StatsRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Skill 2"
+
+[node name="FatigueLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Jiri/InfoColumn/StatsRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Fatigue 0"
+
+[node name="LoyaltyLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Jiri/InfoColumn/StatsRow"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Loyalty 35"
+
+[node name="RestDayButton" type="Button" parent="VBoxContainer/WorkerList/WorkerRow_Jiri"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_colors/font_hover_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_colors/font_pressed_color = Color(0.992157, 0.964706, 0.890196, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_button_focus")
+text = "Rest today"

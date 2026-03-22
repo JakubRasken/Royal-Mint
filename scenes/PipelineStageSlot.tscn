@@ -1,0 +1,189 @@
+[gd_scene load_steps=13 format=3 uid="uid://dhj5f0rxticbn"]
+
+[ext_resource type="Script" path="res://scripts/pipeline_stage.gd" id="1_aa4qg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.992157, 0.964706, 0.890196, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.545098, 0.411765, 0.0784314, 1)
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+shadow_color = Color(0.164706, 0.101961, 0.00784314, 0.35)
+shadow_size = 2
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_separator"]
+color = Color(0.545098, 0.411765, 0.0784314, 1)
+thickness = 2
+grow_begin = 2.0
+grow_end = 2.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
+bg_color = Color(0.960784, 0.901961, 0.698039, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.545098, 0.411765, 0.0784314, 1)
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_hover"]
+bg_color = Color(0.960784, 0.901961, 0.698039, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.360784, 0.266667, 0.0352941, 1)
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_pressed"]
+bg_color = Color(0.545098, 0.411765, 0.0784314, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.360784, 0.266667, 0.0352941, 1)
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_disabled"]
+bg_color = Color(0.866667, 0.839216, 0.756863, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.333333, 0.333333, 0.333333, 1)
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_focus"]
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.545098, 0.411765, 0.0784314, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_background"]
+bg_color = Color(0.866667, 0.839216, 0.756863, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.360784, 0.266667, 0.0352941, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_fill"]
+bg_color = Color(0.545098, 0.101961, 0.101961, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.360784, 0.266667, 0.0352941, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_texture"]
+
+[node name="PipelineStageSlot" type="PanelContainer"]
+custom_minimum_size = Vector2(0, 180)
+anchors_preset = 10
+anchor_right = 1.0
+offset_right = 0.0
+offset_bottom = 180.0
+grow_horizontal = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+script = ExtResource("1_aa4qg")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="StageNameLabel" type="Label" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_font_sizes/font_size = 20
+text = "Smelting"
+
+[node name="WorkerSlot" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="WorkerPortrait" type="TextureRect" parent="VBoxContainer/WorkerSlot"]
+layout_mode = 2
+custom_minimum_size = Vector2(64, 64)
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+theme_override_styles/texture_normal = SubResource("StyleBoxEmpty_texture")
+
+[node name="WorkerName" type="Label" parent="VBoxContainer/WorkerSlot"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.133333, 0.133333, 0.133333, 1)
+theme_override_font_sizes/font_size = 14
+text = "Unassigned"
+vertical_alignment = 1
+
+[node name="AssignButton" type="Button" parent="VBoxContainer/WorkerSlot"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_colors/font_hover_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_colors/font_pressed_color = Color(0.992157, 0.964706, 0.890196, 1)
+theme_override_colors/font_disabled_color = Color(0.333333, 0.333333, 0.333333, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_button_disabled")
+theme_override_styles/focus = SubResource("StyleBoxFlat_button_focus")
+text = "Assign"
+disabled = true
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxLine_separator")
+
+[node name="OutputPreview" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="OutputIcon" type="TextureRect" parent="VBoxContainer/OutputPreview"]
+layout_mode = 2
+custom_minimum_size = Vector2(32, 32)
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+theme_override_styles/texture_normal = SubResource("StyleBoxEmpty_texture")
+
+[node name="OutputLabel" type="Label" parent="VBoxContainer/OutputPreview"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+theme_override_font_sizes/font_size = 14
+text = "~0 coins / shift"
+
+[node name="FatigueBar" type="ProgressBar" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 100.0
+step = 1.0
+theme_override_colors/font_color = Color(0.992157, 0.964706, 0.890196, 1)
+theme_override_styles/background = SubResource("StyleBoxFlat_progress_background")
+theme_override_styles/fill = SubResource("StyleBoxFlat_progress_fill")
+value = 0.0
+show_percentage = false

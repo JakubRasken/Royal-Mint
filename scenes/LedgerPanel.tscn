@@ -1,0 +1,114 @@
+[gd_scene load_steps=9 format=3 uid="uid://cwma3gm0ejthl"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.992157, 0.964706, 0.890196, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.545098, 0.411765, 0.0784314, 1)
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+shadow_color = Color(0.164706, 0.101961, 0.00784314, 0.35)
+shadow_size = 2
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_separator"]
+color = Color(0.545098, 0.411765, 0.0784314, 1)
+thickness = 2
+grow_begin = 2.0
+grow_end = 2.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_background"]
+bg_color = Color(0.866667, 0.839216, 0.756863, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.360784, 0.266667, 0.0352941, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_fill"]
+bg_color = Color(0.164706, 0.352941, 0.164706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.360784, 0.266667, 0.0352941, 1)
+
+[node name="LedgerPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(360, 210)
+anchors_preset = 10
+anchor_right = 1.0
+offset_right = 0.0
+offset_bottom = 210.0
+grow_horizontal = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LedgerTitle" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_font_sizes/font_size = 20
+text = "Ledger"
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxLine_separator")
+
+[node name="QuotaSection" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="QuotaLabel" type="Label" parent="VBoxContainer/QuotaSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.133333, 0.133333, 0.133333, 1)
+theme_override_font_sizes/font_size = 15
+text = "Daily quota: 0 / 20 groschen"
+
+[node name="QuotaBar" type="ProgressBar" parent="VBoxContainer/QuotaSection"]
+layout_mode = 2
+max_value = 20.0
+step = 1.0
+theme_override_colors/font_color = Color(0.992157, 0.964706, 0.890196, 1)
+theme_override_styles/background = SubResource("StyleBoxFlat_progress_background")
+theme_override_styles/fill = SubResource("StyleBoxFlat_progress_fill")
+value = 0.0
+show_percentage = false
+
+[node name="QuotaStatusLabel" type="Label" parent="VBoxContainer/QuotaSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.164706, 0.352941, 0.164706, 1)
+text = "Quota unmet"
+
+[node name="StatsGrid" type="GridContainer" parent="VBoxContainer"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 6
+
+[node name="BalanceHeading" type="Label" parent="VBoxContainer/StatsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Balance"
+
+[node name="BalanceValue" type="Label" parent="VBoxContainer/StatsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.133333, 0.133333, 0.133333, 1)
+theme_override_font_sizes/font_size = 15
+text = "0 groschen"
+
+[node name="DaysHeading" type="Label" parent="VBoxContainer/StatsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Days remaining"
+
+[node name="DaysValue" type="Label" parent="VBoxContainer/StatsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.133333, 0.133333, 0.133333, 1)
+theme_override_font_sizes/font_size = 15
+text = "14"

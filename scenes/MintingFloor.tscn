@@ -1,0 +1,131 @@
+[gd_scene load_steps=12 format=3 uid="uid://g6xarrsdlss3"]
+
+[ext_resource type="PackedScene" path="res://scenes/PipelineStageSlot.tscn" id="1_stage"]
+[ext_resource type="PackedScene" path="res://scenes/LedgerPanel.tscn" id="2_ledger"]
+[ext_resource type="PackedScene" path="res://scenes/WorkerRoster.tscn" id="3_roster"]
+[ext_resource type="PackedScene" path="res://scenes/MorningBrief.tscn" id="4_brief"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
+bg_color = Color(0.960784, 0.901961, 0.698039, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.545098, 0.411765, 0.0784314, 1)
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_hover"]
+bg_color = Color(0.960784, 0.901961, 0.698039, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.360784, 0.266667, 0.0352941, 1)
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_pressed"]
+bg_color = Color(0.545098, 0.411765, 0.0784314, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.360784, 0.266667, 0.0352941, 1)
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+
+[node name="MintingFloor" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.992157, 0.964706, 0.890196, 1)
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -96.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="LeftPanel" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="StageContainer" type="VBoxContainer" parent="HBoxContainer/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PipelineStage_Smelting" parent="HBoxContainer/LeftPanel/StageContainer" instance=ExtResource("1_stage")]
+layout_mode = 2
+stage_id = "smelting"
+stage_name = "Smelting"
+
+[node name="PipelineStage_Striking" parent="HBoxContainer/LeftPanel/StageContainer" instance=ExtResource("1_stage")]
+layout_mode = 2
+stage_id = "striking"
+stage_name = "Striking"
+
+[node name="PipelineStage_Assay" parent="HBoxContainer/LeftPanel/StageContainer" instance=ExtResource("1_stage")]
+layout_mode = 2
+stage_id = "assay"
+stage_name = "Assay"
+
+[node name="RightPanel" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(360, 0)
+theme_override_constants/separation = 12
+
+[node name="LedgerPanel" parent="HBoxContainer/RightPanel" instance=ExtResource("2_ledger")]
+layout_mode = 2
+
+[node name="WorkerRoster" parent="HBoxContainer/RightPanel" instance=ExtResource("3_roster")]
+layout_mode = 2
+
+[node name="DayAdvanceButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -120.0
+offset_top = -64.0
+offset_right = 120.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_colors/font_hover_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_colors/font_pressed_color = Color(0.992157, 0.964706, 0.890196, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+text = "Advance to next day"
+
+[node name="MorningBrief" parent="." instance=ExtResource("4_brief")]
+visible = false

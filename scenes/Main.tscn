@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://cywn0c44j1w17"]
+
+[ext_resource type="PackedScene" path="res://scenes/MintingFloor.tscn" id="1_floor"]
+
+[node name="Main" type="Node"]
+
+[node name="MintingFloor" parent="." instance=ExtResource("1_floor")]

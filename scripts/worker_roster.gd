@@ -14,6 +14,7 @@ const READY_ROW_MODULATE: Color = Color(1, 1, 1, 1)
 const RESTING_ROW_MODULATE: Color = Color(0.75, 0.75, 0.75, 1.0)
 const HIGHLIGHT_ROW_MODULATE: Color = Color(1.0, 0.9686, 0.8431, 1.0)
 const DIMMED_ROW_MODULATE: Color = Color(0.88, 0.88, 0.88, 1.0)
+const INCAPACITATED_ROW_MODULATE: Color = Color(0.92, 0.84, 0.84, 1.0)
 
 @onready var _worker_rows: Dictionary = {
     "Radek": $"VBoxContainer/WorkerList/WorkerRow_Radek",
@@ -100,6 +101,9 @@ func _on_rest_button_pressed(worker_name: String) -> void:
 
 
 func _build_status_text(worker: Worker) -> String:
+    if worker.is_incapacitated():
+        return "Collapsed after the last shift"
+
     if worker.is_resting:
         return "Resting today"
 
@@ -121,6 +125,9 @@ func _build_status_text(worker: Worker) -> String:
 
 
 func _row_modulate_for_worker(worker: Worker) -> Color:
+    if worker.is_incapacitated():
+        return INCAPACITATED_ROW_MODULATE
+
     if worker.is_resting:
         return RESTING_ROW_MODULATE
 

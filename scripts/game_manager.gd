@@ -104,6 +104,17 @@ func get_last_shift_results() -> Dictionary:
     return _last_shift_results.duplicate(true)
 
 
+func evaluate_worker_collapse() -> void:
+    if workers.is_empty():
+        return
+
+    for worker: Worker in workers:
+        if not worker.is_incapacitated():
+            return
+
+    _trigger_immediate_failure("workers_incapacitated")
+
+
 func _start_day(day_num: int) -> void:
     current_day = day_num
     current_phase = GamePhase.MORNING_BRIEF

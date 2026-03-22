@@ -66,7 +66,7 @@ func _on_stage_worker_removed(stage_id: String) -> void:
 
 
 func _on_worker_selected(worker: Worker) -> void:
-    if _pending_stage_id.is_empty() or worker.is_resting:
+    if _pending_stage_id.is_empty() or worker.is_resting or worker.is_incapacitated():
         return
 
     var expected_role: String = ROLE_BY_STAGE.get(_pending_stage_id, "")
@@ -126,6 +126,7 @@ func _on_day_advance_pressed() -> void:
 
 func _on_day_started(day_num: int) -> void:
     _pending_stage_id = ""
+    _clear_incapacitated_assignments()
     _update_header_day(day_num)
     _morning_brief.show_brief(day_num, GameManager.active_event)
     _refresh_stage_previews()
@@ -178,7 +179,11 @@ func _complete_current_shift() -> void:
         "quality_grade": quality_grade
     })
 
+    if GameManager.current_phase == GameManager.GamePhase.COMPLETE:
+        return
+
     _apply_end_of_day_worker_updates()
+    GameManager.evaluate_worker_collapse()
     _refresh_stage_previews()
     _worker_roster.refresh()
 
@@ -208,7 +213,7 @@ func _refresh_stage_previews() -> void:
             stage_node.assign_worker(worker)
         else:
             stage_node.refresh_worker_state()
-        stage_node.set_output_preview(_calculate_worker_output(worker))
+        stage_node.set_output_preview(0 if worker.is_incapacitated() else _calculate_worker_output(worker))
 
     _refresh_assignment_feedback()
     _worker_roster.set_stage_assignments(GameManager.stage_assignments)
@@ -255,6 +260,7 @@ func _clear_pending_stage_assignment(stage_id: String = "") -> void:
 
 
 func _resume_from_game_state() -> void:
+    _clear_incapacitated_assignments()
     _update_header_day(GameManager.current_day)
     _refresh_stage_previews()
     _worker_roster.refresh()
@@ -339,3 +345,10 @@ func _to_roman(number: int) -> String:
             remainder -= numeral_value
 
     return roman_text if not roman_text.is_empty() else "I"
+
+
+func _clear_incapacitated_assignments() -> void:
+    for stage_id: String in GameManager.stage_assignments.keys():
+        var worker: Worker = GameManager.stage_assignments.get(stage_id) as Worker
+        if worker != null and worker.is_incapacitated():
+            GameManager.stage_assignments.erase(stage_id)

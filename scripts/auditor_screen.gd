@@ -9,6 +9,14 @@ extends CanvasLayer
 func show_result(ending_id: String, snapshot: Dictionary) -> void:
     visible = true
 
+    if ending_id == "workers_incapacitated":
+        _result_title.text = "The mintmaster loses the floor"
+        _result_summary.text = (
+            "Every moneyer has collapsed at the bench. Quota stands at %d / %d, "
+            + "and the Crown removes you before the furnaces cool."
+        ) % [int(snapshot["cumulative_output"]), int(snapshot["cumulative_target"])]
+        return
+
     if ending_id == "zero_output_collapse":
         _result_title.text = "The mint falls silent"
         _result_summary.text = (

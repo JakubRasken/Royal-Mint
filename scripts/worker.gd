@@ -23,6 +23,10 @@ func apply_loyalty_delta(amount: int) -> void:
     loyalty = clampi(loyalty + amount, 0, 100)
 
 
+func is_incapacitated() -> bool:
+    return fatigue >= MAX_FATIGUE
+
+
 func mark_rest_day() -> void:
     is_resting = true
 

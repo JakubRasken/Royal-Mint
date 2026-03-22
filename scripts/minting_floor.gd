@@ -18,6 +18,7 @@ const GROSCHEN_VALUE_PER_MERCHANT_COIN: int = 1
 @onready var _morning_brief = $MorningBrief
 @onready var _auditor_screen = $AuditorScreen
 @onready var _day_advance_button: Button = $DayAdvanceButton
+@onready var _day_counter_label: Label = $HeaderBar/HeaderContent/DayCounterLabel
 @onready var _shift_report_panel: PanelContainer = $"HBoxContainer/LeftPanel/ShiftReportPanel"
 @onready var _shift_report_title: Label = $"HBoxContainer/LeftPanel/ShiftReportPanel/VBoxContainer/ShiftReportTitle"
 @onready var _shift_report_summary: Label = $"HBoxContainer/LeftPanel/ShiftReportPanel/VBoxContainer/ShiftReportSummary"
@@ -125,6 +126,7 @@ func _on_day_advance_pressed() -> void:
 
 func _on_day_started(day_num: int) -> void:
     _pending_stage_id = ""
+    _update_header_day(day_num)
     _morning_brief.show_brief(day_num, GameManager.active_event)
     _refresh_stage_previews()
     _worker_roster.refresh()
@@ -204,6 +206,8 @@ func _refresh_stage_previews() -> void:
 
         if stage_node.get_assigned_worker() != worker:
             stage_node.assign_worker(worker)
+        else:
+            stage_node.refresh_worker_state()
         stage_node.set_output_preview(_calculate_worker_output(worker))
 
     _refresh_assignment_feedback()
@@ -251,6 +255,7 @@ func _clear_pending_stage_assignment(stage_id: String = "") -> void:
 
 
 func _resume_from_game_state() -> void:
+    _update_header_day(GameManager.current_day)
     _refresh_stage_previews()
     _worker_roster.refresh()
     _update_day_button_for_phase()
@@ -306,3 +311,31 @@ func _show_shift_report(results: Dictionary) -> void:
     _shift_report_detail.text = (
         "Quota %s. Balance stands at %d groschen."
     ) % ["met" if quota_met else "unmet", Ledger.get_balance()]
+
+
+func _update_header_day(day_num: int) -> void:
+    if day_num <= 0:
+        _day_counter_label.text = "Day -"
+        return
+    _day_counter_label.text = "Day %s of XIV" % _to_roman(day_num)
+
+
+func _to_roman(number: int) -> String:
+    var remainder: int = maxi(number, 0)
+    var roman_text: String = ""
+    var numerals: Array[Array] = [
+        [10, "X"],
+        [9, "IX"],
+        [5, "V"],
+        [4, "IV"],
+        [1, "I"]
+    ]
+
+    for numeral_data: Array in numerals:
+        var numeral_value: int = int(numeral_data[0])
+        var numeral_text: String = String(numeral_data[1])
+        while remainder >= numeral_value:
+            roman_text += numeral_text
+            remainder -= numeral_value
+
+    return roman_text if not roman_text.is_empty() else "I"

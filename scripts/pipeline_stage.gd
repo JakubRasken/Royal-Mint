@@ -12,6 +12,11 @@ const REMOVE_BUTTON_TEXT: String = "Remove"
 const ASSIGN_BUTTON_TEXT: String = "Assign"
 const PICK_WORKER_TEXT: String = "Pick worker"
 const ACTIVE_STAGE_MODULATE: Color = Color(1.0, 0.9725, 0.8902, 1.0)
+const FATIGUE_SEGMENT_STEP: int = 20
+const FATIGUE_INACTIVE_COLOR: Color = Color(0.8667, 0.8392, 0.7569, 1.0)
+const FATIGUE_LOW_COLOR: Color = Color(0.9608, 0.9019, 0.6980, 1.0)
+const FATIGUE_MID_COLOR: Color = Color(0.5451, 0.4118, 0.0784, 1.0)
+const FATIGUE_HIGH_COLOR: Color = Color(0.5451, 0.1020, 0.1020, 1.0)
 
 @export var stage_id: String = "smelting"
 @export var stage_name: String = "Smelting"
@@ -20,7 +25,13 @@ const ACTIVE_STAGE_MODULATE: Color = Color(1.0, 0.9725, 0.8902, 1.0)
 @onready var _worker_name_label: Label = %WorkerName
 @onready var _assign_button: Button = %AssignButton
 @onready var _output_label: Label = %OutputLabel
-@onready var _fatigue_bar: ProgressBar = %FatigueBar
+@onready var _fatigue_segments: Array[ColorRect] = [
+    %FatigueSegment1,
+    %FatigueSegment2,
+    %FatigueSegment3,
+    %FatigueSegment4,
+    %FatigueSegment5
+]
 
 var _assigned_worker: Worker
 var _assignment_pending: bool = false
@@ -58,6 +69,10 @@ func set_assignment_pending(is_pending: bool) -> void:
     _refresh_display()
 
 
+func refresh_worker_state() -> void:
+    _refresh_display()
+
+
 func get_assigned_worker() -> Worker:
     return _assigned_worker
 
@@ -70,14 +85,14 @@ func _refresh_display() -> void:
         _assign_button.text = PICK_WORKER_TEXT if _assignment_pending else ASSIGN_BUTTON_TEXT
         _assign_button.disabled = false
         _output_label.text = "Select a worker from the roster" if _assignment_pending else EMPTY_OUTPUT_TEXT
-        _fatigue_bar.value = 0
+        _update_fatigue_display(0)
         self_modulate = ACTIVE_STAGE_MODULATE if _assignment_pending else Color(1, 1, 1, 1)
         return
 
     _worker_name_label.text = _assigned_worker.worker_name
     _assign_button.text = REMOVE_BUTTON_TEXT
     _assign_button.disabled = false
-    _fatigue_bar.value = _assigned_worker.fatigue
+    _update_fatigue_display(_assigned_worker.fatigue)
     self_modulate = Color(1, 1, 1, 1)
 
 
@@ -87,3 +102,20 @@ func _on_assign_button_pressed() -> void:
         return
 
     assignment_requested.emit(stage_id)
+
+
+func _update_fatigue_display(fatigue_value: int) -> void:
+    var active_segments: int = clampi(int(ceili(float(fatigue_value) / FATIGUE_SEGMENT_STEP)), 0, _fatigue_segments.size())
+
+    for segment_index: int in _fatigue_segments.size():
+        var segment: ColorRect = _fatigue_segments[segment_index]
+        if segment_index >= active_segments:
+            segment.color = FATIGUE_INACTIVE_COLOR
+            continue
+
+        if segment_index <= 1:
+            segment.color = FATIGUE_LOW_COLOR
+        elif segment_index <= 3:
+            segment.color = FATIGUE_MID_COLOR
+        else:
+            segment.color = FATIGUE_HIGH_COLOR

@@ -177,13 +177,42 @@ theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
 theme_override_font_sizes/font_size = 14
 text = "~0 coins / shift"
 
-[node name="FatigueBar" type="ProgressBar" parent="VBoxContainer"]
+[node name="FatigueBar" type="HBoxContainer" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-max_value = 100.0
-step = 1.0
-theme_override_colors/font_color = Color(0.992157, 0.964706, 0.890196, 1)
-theme_override_styles/background = SubResource("StyleBoxFlat_progress_background")
-theme_override_styles/fill = SubResource("StyleBoxFlat_progress_fill")
-value = 0.0
-show_percentage = false
+theme_override_constants/separation = 6
+
+[node name="FatigueSegment1" type="ColorRect" parent="VBoxContainer/FatigueBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.866667, 0.839216, 0.756863, 1)
+
+[node name="FatigueSegment2" type="ColorRect" parent="VBoxContainer/FatigueBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.866667, 0.839216, 0.756863, 1)
+
+[node name="FatigueSegment3" type="ColorRect" parent="VBoxContainer/FatigueBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.866667, 0.839216, 0.756863, 1)
+
+[node name="FatigueSegment4" type="ColorRect" parent="VBoxContainer/FatigueBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.866667, 0.839216, 0.756863, 1)
+
+[node name="FatigueSegment5" type="ColorRect" parent="VBoxContainer/FatigueBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.866667, 0.839216, 0.756863, 1)

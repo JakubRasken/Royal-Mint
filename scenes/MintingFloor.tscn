@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://g6xarrsdlss3"]
+[gd_scene load_steps=18 format=3 uid="uid://g6xarrsdlss3"]
 
 [ext_resource type="PackedScene" path="res://scenes/PipelineStageSlot.tscn" id="1_stage"]
 [ext_resource type="PackedScene" path="res://scenes/LedgerPanel.tscn" id="2_ledger"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/MorningBrief.tscn" id="4_brief"]
 [ext_resource type="PackedScene" path="res://scenes/AuditorScreen.tscn" id="5_audit"]
 [ext_resource type="Script" path="res://scripts/minting_floor.gd" id="6_floor"]
+[ext_resource type="Texture2D" path="res://assets/ui/logo_coin_gold.svg" id="7_logo"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
 bg_color = Color(0.960784, 0.901961, 0.698039, 1)
@@ -81,13 +82,59 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.992157, 0.964706, 0.890196, 1)
 
+[node name="HeaderBar" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 80.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="HeaderContent" type="HBoxContainer" parent="HeaderBar"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CoinLogo" type="TextureRect" parent="HeaderBar/HeaderContent"]
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+texture = ExtResource("7_logo")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleColumn" type="VBoxContainer" parent="HeaderBar/HeaderContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="GameTitleLabel" type="Label" parent="HeaderBar/HeaderContent/TitleColumn"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_font_sizes/font_size = 22
+text = "Royal Mint"
+
+[node name="SubtitleLabel" type="Label" parent="HeaderBar/HeaderContent/TitleColumn"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Strike true. Keep the books clean."
+
+[node name="DayCounterLabel" type="Label" parent="HeaderBar/HeaderContent"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_font_sizes/font_size = 20
+text = "Day I of XIV"
+horizontal_alignment = 2
+vertical_alignment = 1
+
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 24.0
-offset_top = 24.0
+offset_top = 96.0
 offset_right = -24.0
 offset_bottom = -96.0
 grow_horizontal = 2

@@ -19,10 +19,8 @@ const ASSIGN_BUTTON_TEXT: String = "Assign"
 const PICK_WORKER_TEXT: String = "Pick worker"
 const ACTIVE_STAGE_MODULATE: Color = Color(1.0, 0.9725, 0.8902, 1.0)
 const FATIGUE_SEGMENT_STEP: int = 20
-const FATIGUE_INACTIVE_COLOR: Color = Color(0.8667, 0.8392, 0.7569, 1.0)
-const FATIGUE_LOW_COLOR: Color = Color(0.9608, 0.9019, 0.6980, 1.0)
-const FATIGUE_MID_COLOR: Color = Color(0.5451, 0.4118, 0.0784, 1.0)
-const FATIGUE_HIGH_COLOR: Color = Color(0.5451, 0.1020, 0.1020, 1.0)
+const FATIGUE_DEPLETED_COLOR: Color = Color(0.1647, 0.1020, 0.0078, 1.0)
+const FATIGUE_ACTIVE_COLOR: Color = Color(0.5451, 0.4118, 0.0784, 1.0)
 
 @export var stage_id: String = "smelting"
 @export var stage_name: String = "Smelting"
@@ -132,13 +130,4 @@ func _update_fatigue_display(fatigue_value: int) -> void:
 
 	for segment_index: int in _fatigue_segments.size():
 		var segment: ColorRect = _fatigue_segments[segment_index]
-		if segment_index >= active_segments:
-			segment.color = FATIGUE_INACTIVE_COLOR
-			continue
-
-		if segment_index <= 1:
-			segment.color = FATIGUE_LOW_COLOR
-		elif segment_index <= 3:
-			segment.color = FATIGUE_MID_COLOR
-		else:
-			segment.color = FATIGUE_HIGH_COLOR
+		segment.color = FATIGUE_ACTIVE_COLOR if segment_index < active_segments else FATIGUE_DEPLETED_COLOR

@@ -222,41 +222,6 @@ layout_mode = 2
 stage_id = "assay"
 stage_name = "Assay"
 
-[node name="ShiftReportPanel" type="PanelContainer" parent="ScreenLayout/MainContent/LeftPanel"]
-custom_minimum_size = Vector2(0, 120)
-layout_mode = 2
-size_flags_horizontal = 3
-clip_contents = false
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="ScreenLayout/MainContent/LeftPanel/ShiftReportPanel"]
-layout_mode = 2
-clip_contents = false
-theme_override_constants/separation = 6
-
-[node name="ShiftReportTitle" type="Label" parent="ScreenLayout/MainContent/LeftPanel/ShiftReportPanel/VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
-theme_override_font_sizes/font_size = 18
-text = "Shift report"
-
-[node name="HSeparator" type="HSeparator" parent="ScreenLayout/MainContent/LeftPanel/ShiftReportPanel/VBoxContainer"]
-layout_mode = 2
-theme_override_styles/separator = SubResource("StyleBoxLine_separator")
-
-[node name="ShiftReportSummary" type="Label" parent="ScreenLayout/MainContent/LeftPanel/ShiftReportPanel/VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.133333, 0.133333, 0.133333, 1)
-theme_override_font_sizes/font_size = 15
-text = "No shift completed yet."
-autowrap_mode = 3
-
-[node name="ShiftReportDetail" type="Label" parent="ScreenLayout/MainContent/LeftPanel/ShiftReportPanel/VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
-text = "Assign the floor and prepare the day's output."
-autowrap_mode = 3
-
 [node name="RightPanel" type="VBoxContainer" parent="ScreenLayout/MainContent"]
 layout_mode = 2
 custom_minimum_size = Vector2(360, 0)
@@ -268,6 +233,26 @@ layout_mode = 2
 
 [node name="WorkerRoster" parent="ScreenLayout/MainContent/RightPanel" instance=ExtResource("3_roster")]
 layout_mode = 2
+
+[node name="BottomSection" type="VBoxContainer" parent="ScreenLayout"]
+layout_mode = 2
+size_flags_vertical = 8
+clip_contents = false
+theme_override_constants/separation = 8
+
+[node name="ShiftReport" type="PanelContainer" parent="ScreenLayout/BottomSection"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+clip_contents = false
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="ShiftReportLabel" type="Label" parent="ScreenLayout/BottomSection/ShiftReport"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.133333, 0.133333, 0.133333, 1)
+theme_override_font_sizes/font_size = 15
+text = "No shift completed yet. Assign the floor and prepare the day's output."
+autowrap_mode = 3
 
 [node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
@@ -282,19 +267,10 @@ texture = ExtResource("8_background")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="DayAdvanceButton" type="Button" parent="."]
-custom_minimum_size = Vector2(0, 62)
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 24.0
-offset_top = -82.0
-offset_right = -24.0
-offset_bottom = -20.0
-grow_horizontal = 2
-grow_vertical = 0
+[node name="EndShiftButton" type="Button" parent="ScreenLayout/BottomSection"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
 theme_override_colors/font_hover_color = Color(0.360784, 0.266667, 0.0352941, 1)
 theme_override_colors/font_pressed_color = Color(0.992157, 0.964706, 0.890196, 1)

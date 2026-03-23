@@ -25,12 +25,10 @@ const QUALITY_FATIGUE_PENALTY: float = 0.15
 @onready var _worker_roster = $"ScreenLayout/MainContent/RightPanel/WorkerRoster"
 @onready var _morning_brief = $MorningBrief
 @onready var _auditor_screen = $AuditorScreen
-@onready var _day_advance_button: Button = $DayAdvanceButton
+@onready var _day_advance_button: Button = $"ScreenLayout/BottomSection/EndShiftButton"
 @onready var _day_counter_label: Label = $ScreenLayout/HeaderBar/HeaderContent/DayCounterLabel
-@onready var _shift_report_panel: PanelContainer = $"ScreenLayout/MainContent/LeftPanel/ShiftReportPanel"
-@onready var _shift_report_title: Label = $"ScreenLayout/MainContent/LeftPanel/ShiftReportPanel/VBoxContainer/ShiftReportTitle"
-@onready var _shift_report_summary: Label = $"ScreenLayout/MainContent/LeftPanel/ShiftReportPanel/VBoxContainer/ShiftReportSummary"
-@onready var _shift_report_detail: Label = $"ScreenLayout/MainContent/LeftPanel/ShiftReportPanel/VBoxContainer/ShiftReportDetail"
+@onready var _shift_report_panel: PanelContainer = $"ScreenLayout/BottomSection/ShiftReport"
+@onready var _shift_report_label: Label = $"ScreenLayout/BottomSection/ShiftReport/ShiftReportLabel"
 
 var _pending_stage_id: String = ""
  
@@ -331,9 +329,9 @@ func _refresh_assignment_feedback() -> void:
 
 func _show_waiting_shift_report() -> void:
     _shift_report_panel.visible = true
-    _shift_report_title.text = "Shift report"
-    _shift_report_summary.text = "No shift completed yet for Day %d." % GameManager.current_day
-    _shift_report_detail.text = "Assign the floor, mind the fatigue, and strike enough merchant-grade coin to satisfy the Crown."
+    _shift_report_label.text = (
+        "Shift report: No shift completed yet for Day %d. Assign the floor, mind the fatigue, and strike enough merchant-grade coin to satisfy the Crown."
+    ) % GameManager.current_day
 
 
 func _show_shift_report(results: Dictionary) -> void:
@@ -346,12 +344,10 @@ func _show_shift_report(results: Dictionary) -> void:
     var wages_paid: int = int(results.get("wages_paid", 0))
     var net_result: int = int(results.get("net_result", 0))
 
-    _shift_report_title.text = "Evening report - Day %d" % GameManager.current_day
-    _shift_report_summary.text = (
-        "%d coins struck. %d counted toward quota at %s grade."
-    ) % [total_output, merchant_output, quality_grade]
-
     var report_parts: Array[String] = [
+        "Evening report - Day %d." % GameManager.current_day,
+        "%d coins struck." % total_output,
+        "%d counted toward quota at %s grade." % [merchant_output, quality_grade],
         "Quota %s." % ("met" if quota_met else "unmet"),
         "Wages cost %d groschen." % wages_paid,
         "Net %s%d." % ["+" if net_result >= 0 else "-", abs(net_result)],
@@ -359,7 +355,7 @@ func _show_shift_report(results: Dictionary) -> void:
     ]
     if floor_hands_used > 0:
         report_parts.insert(1, "Floor hands covered %d stage(s)." % floor_hands_used)
-    _shift_report_detail.text = " ".join(report_parts)
+    _shift_report_label.text = " ".join(report_parts)
 
 
 func _update_header_day(day_num: int) -> void:

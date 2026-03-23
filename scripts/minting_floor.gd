@@ -16,6 +16,11 @@ const FLOOR_HAND_MERCHANT_FACTOR: float = 0.4
 const QUALITY_BASE_SCORE: float = 40.0
 const QUALITY_SKILL_WEIGHT: float = 15.0
 const QUALITY_FATIGUE_PENALTY: float = 0.15
+const DAY_COUNTER_SAFE_COLOR: Color = Color("8b6914")
+const DAY_COUNTER_WARNING_COLOR: Color = Color("c17f24")
+const DAY_COUNTER_DANGER_COLOR: Color = Color("8b1a1a")
+const DAY_COUNTER_PULSE_MIN_ALPHA: float = 0.6
+const DAY_COUNTER_PULSE_DURATION: float = 0.6
 
 @onready var _stage_nodes: Dictionary = {
     "smelting": $"ScreenLayout/MainContent/LeftPanel/StageContainer/PipelineStage_Smelting",
@@ -31,6 +36,7 @@ const QUALITY_FATIGUE_PENALTY: float = 0.15
 @onready var _shift_report_label: Label = $"ScreenLayout/BottomSection/ShiftReport/ShiftReportLabel"
 
 var _pending_stage_id: String = ""
+var _day_counter_tween: Tween
  
 
 func _ready() -> void:
@@ -359,10 +365,32 @@ func _show_shift_report(results: Dictionary) -> void:
 
 
 func _update_header_day(day_num: int) -> void:
+    if _day_counter_tween != null:
+        _day_counter_tween.kill()
+        _day_counter_tween = null
+
     if day_num <= 0:
         _day_counter_label.text = "Day - / %d" % GameManager.FINAL_DAY
+        _day_counter_label.add_theme_color_override("font_color", DAY_COUNTER_SAFE_COLOR)
+        _day_counter_label.modulate = Color(1, 1, 1, 1)
         return
+
     _day_counter_label.text = "Day %d / %d" % [day_num, GameManager.FINAL_DAY]
+    _day_counter_label.modulate = Color(1, 1, 1, 1)
+
+    if day_num >= 13:
+        _day_counter_label.add_theme_color_override("font_color", DAY_COUNTER_DANGER_COLOR)
+        _day_counter_tween = create_tween()
+        _day_counter_tween.set_loops()
+        _day_counter_tween.tween_property(_day_counter_label, "modulate:a", DAY_COUNTER_PULSE_MIN_ALPHA, DAY_COUNTER_PULSE_DURATION)
+        _day_counter_tween.tween_property(_day_counter_label, "modulate:a", 1.0, DAY_COUNTER_PULSE_DURATION)
+        return
+
+    if day_num >= 10:
+        _day_counter_label.add_theme_color_override("font_color", DAY_COUNTER_WARNING_COLOR)
+        return
+
+    _day_counter_label.add_theme_color_override("font_color", DAY_COUNTER_SAFE_COLOR)
 
 
 func _clear_incapacitated_assignments() -> void:

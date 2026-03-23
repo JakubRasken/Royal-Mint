@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://g6xarrsdlss3"]
+[gd_scene load_steps=22 format=3 uid="uid://g6xarrsdlss3"]
 
 [ext_resource type="PackedScene" path="res://scenes/PipelineStageSlot.tscn" id="1_stage"]
 [ext_resource type="PackedScene" path="res://scenes/LedgerPanel.tscn" id="2_ledger"]
@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" path="res://assets/ui/background_mint_floor.png" id="8_background"]
 [ext_resource type="Texture2D" path="res://assets/sprites/icon_stat_loyalty.png" id="9_seal"]
 [ext_resource type="Script" path="res://scripts/candlelight_vignette.gd" id="10_vignette"]
+[ext_resource type="Script" path="res://scripts/shift_timer_bar.gd" id="11_shift_timer"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
 bg_color = Color(0.960784, 0.901961, 0.698039, 1)
@@ -213,6 +214,28 @@ layout_mode = 2
 size_flags_horizontal = 3
 clip_contents = false
 theme_override_constants/separation = 12
+
+[node name="ShiftTimerSection" type="VBoxContainer" parent="ScreenLayout/MainContent/LeftPanel"]
+visible = false
+layout_mode = 2
+clip_contents = false
+theme_override_constants/separation = 4
+
+[node name="ShiftTimerBar" type="Control" parent="ScreenLayout/MainContent/LeftPanel/ShiftTimerSection"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 20)
+size_flags_horizontal = 3
+mouse_filter = 2
+script = ExtResource("11_shift_timer")
+
+[node name="ShiftTimerWarningLabel" type="Label" parent="ScreenLayout/MainContent/LeftPanel/ShiftTimerSection"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.545098, 0.101961, 0.101961, 1)
+theme_override_font_sizes/font_size = 13
+text = "The day wanes. Strike what you can."
+
+[node name="ShiftTimerAudioPlayer" type="AudioStreamPlayer" parent="ScreenLayout/MainContent/LeftPanel/ShiftTimerSection"]
 
 [node name="StageContainer" type="VBoxContainer" parent="ScreenLayout/MainContent/LeftPanel"]
 layout_mode = 2

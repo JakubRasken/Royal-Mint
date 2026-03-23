@@ -30,6 +30,12 @@ const SHIFT_GRADE_ROYAL_COLOR: Color = Color("8b6914")
 const SHIFT_GRADE_MERCHANT_COLOR: Color = Color("2a5a2a")
 const SHIFT_GRADE_COMMON_COLOR: Color = Color("c17f24")
 const SHIFT_GRADE_DEBASED_COLOR: Color = Color("8b1a1a")
+const SHIFT_TIMER_BELL_FREQUENCY: float = 523.25
+const SHIFT_TIMER_BELL_DURATION: float = 0.18
+const SHIFT_TIMER_BELL_GAIN: float = 0.18
+const SHIFT_TIMER_BELL_BUFFER_LENGTH: float = 0.3
+const SHIFT_TIMER_BELL_PULSE_MIN_ALPHA: float = 0.55
+const SHIFT_TIMER_BELL_PULSE_SPEED: float = 4.0
 
 @onready var _stage_nodes: Dictionary = {
     "smelting": $"ScreenLayout/MainContent/LeftPanel/StageContainer/PipelineStage_Smelting",
@@ -47,12 +53,22 @@ const SHIFT_GRADE_DEBASED_COLOR: Color = Color("8b1a1a")
 @onready var _grade_stamp: PanelContainer = $"ScreenLayout/BottomSection/ShiftReport/ReportContent/GradeStamp"
 @onready var _grade_stamp_label: Label = $"ScreenLayout/BottomSection/ShiftReport/ReportContent/GradeStamp/GradeStampLabel"
 @onready var _shift_report_detail: Label = $"ScreenLayout/BottomSection/ShiftReport/ReportContent/ShiftReportDetail"
+@onready var _shift_timer_section: VBoxContainer = $"ScreenLayout/MainContent/LeftPanel/ShiftTimerSection"
+@onready var _shift_timer_bar = $"ScreenLayout/MainContent/LeftPanel/ShiftTimerSection/ShiftTimerBar"
+@onready var _shift_timer_warning_label: Label = $"ScreenLayout/MainContent/LeftPanel/ShiftTimerSection/ShiftTimerWarningLabel"
+@onready var _shift_timer_audio_player: AudioStreamPlayer = $"ScreenLayout/MainContent/LeftPanel/ShiftTimerSection/ShiftTimerAudioPlayer"
 
 var _pending_stage_id: String = ""
 var _day_counter_tween: Tween
+var _shift_time_remaining: float = 0.0
+var _shift_timer_running: bool = false
+var _shift_timer_warning_played: bool = false
+var _shift_timer_audio_playback: AudioStreamGeneratorPlayback
+var _shift_timer_elapsed: float = 0.0
  
 
 func _ready() -> void:
+    _setup_shift_timer_audio()
     _connect_stage_signals()
     _worker_roster.worker_selected.connect(_on_worker_selected)
     _worker_roster.rest_toggled.connect(_on_worker_rest_toggled)
@@ -70,6 +86,10 @@ func _ready() -> void:
         _worker_roster.set_workers(GameManager.workers)
     else:
         _resume_from_game_state()
+
+
+func _process(delta: float) -> void:
+    _update_shift_timer(delta)
 
 
 func _connect_stage_signals() -> void:
@@ -135,6 +155,7 @@ func _on_begin_shift_requested() -> void:
     _pending_stage_id = ""
     GameManager.begin_shift()
     _set_stage_shift_active(true)
+    _start_shift_timer()
     _morning_brief.hide_brief()
     _update_day_button_for_phase()
 
@@ -158,6 +179,7 @@ func _on_day_advance_pressed() -> void:
 func _on_day_started(day_num: int) -> void:
     _pending_stage_id = ""
     _set_stage_shift_active(false)
+    _stop_shift_timer()
     _clear_incapacitated_assignments()
     _update_header_day(day_num)
     _morning_brief.show_brief(day_num, GameManager.active_event)
@@ -174,12 +196,16 @@ func _on_day_ended(_results: Dictionary) -> void:
 
 func _on_game_over(ending_id: String) -> void:
     _set_stage_shift_active(false)
+    _stop_shift_timer()
+    _shift_timer_section.visible = false
     _day_advance_button.visible = false
     _morning_brief.hide_brief()
     _auditor_screen.show_result(ending_id, Ledger.get_audit_snapshot())
 
 
 func _complete_current_shift() -> void:
+    _stop_shift_timer()
+    _set_stage_shift_active(false)
     _pending_stage_id = ""
     var stage_outputs: Array[int] = []
     var quality_scores: Array[float] = []
@@ -219,7 +245,6 @@ func _complete_current_shift() -> void:
     var income_earned: int = merchant_or_better * GROSCHEN_VALUE_PER_MERCHANT_COIN
     Ledger.add_income(income_earned)
     var wages_paid: int = Ledger.apply_daily_wages(GameManager.workers)
-    _set_stage_shift_active(false)
     GameManager.complete_shift({
         "total_output": total_output,
         "merchant_grade_or_better": merchant_or_better,
@@ -318,6 +343,7 @@ func _update_day_button_for_phase() -> void:
         _day_advance_button.text = "End shift"
     elif GameManager.current_phase == GameManager.GamePhase.EVENING_REPORT:
         _day_advance_button.text = "Advance to next day"
+    _shift_timer_section.visible = GameManager.current_phase == GameManager.GamePhase.SHIFT
 
 
 func _clear_pending_stage_assignment(stage_id: String = "") -> void:
@@ -353,6 +379,11 @@ func _resume_from_game_state() -> void:
         _show_shift_report(GameManager.get_last_shift_results())
     else:
         _show_waiting_shift_report()
+
+    if GameManager.current_phase == GameManager.GamePhase.SHIFT:
+        _start_shift_timer()
+    else:
+        _stop_shift_timer()
 
 
 func _refresh_assignment_feedback() -> void:
@@ -485,3 +516,88 @@ func _set_stage_shift_active(is_active: bool) -> void:
     for stage_id: String in _stage_nodes.keys():
         var stage_node = _stage_nodes[stage_id]
         stage_node.set_shift_active(is_active)
+
+
+func _start_shift_timer() -> void:
+    _shift_time_remaining = float(GameManager.SHIFT_DURATION_SECONDS)
+    _shift_timer_elapsed = 0.0
+    _shift_timer_running = true
+    _shift_timer_warning_played = false
+    _shift_timer_section.visible = true
+    _update_shift_timer_display()
+
+
+func _stop_shift_timer() -> void:
+    _shift_timer_running = false
+    _shift_time_remaining = 0.0
+    _shift_timer_elapsed = 0.0
+    _shift_timer_warning_played = false
+    _shift_timer_section.visible = false
+    _update_shift_timer_display()
+
+
+func _update_shift_timer(delta: float) -> void:
+    if not _shift_timer_running:
+        return
+    if GameManager.current_phase != GameManager.GamePhase.SHIFT:
+        return
+    if _morning_brief.visible:
+        return
+
+    _shift_time_remaining = maxf(_shift_time_remaining - delta, 0.0)
+    _shift_timer_elapsed += delta
+
+    if not _shift_timer_warning_played and _shift_time_remaining <= 60.0:
+        _shift_timer_warning_played = true
+        _play_shift_timer_bell()
+
+    _update_shift_timer_display()
+
+    if _shift_time_remaining <= 0.0:
+        _complete_current_shift()
+
+
+func _update_shift_timer_display() -> void:
+    var remaining_ratio: float = 0.0
+    if GameManager.SHIFT_DURATION_SECONDS > 0:
+        remaining_ratio = clampf(_shift_time_remaining / float(GameManager.SHIFT_DURATION_SECONDS), 0.0, 1.0)
+
+    var timer_phase: int = _shift_timer_phase()
+    var pulse_alpha: float = 1.0
+    if timer_phase == 2:
+        pulse_alpha = lerpf(
+            SHIFT_TIMER_BELL_PULSE_MIN_ALPHA,
+            1.0,
+            (sin(_shift_timer_elapsed * SHIFT_TIMER_BELL_PULSE_SPEED) + 1.0) * 0.5
+        )
+
+    _shift_timer_bar.set_display(remaining_ratio, timer_phase, pulse_alpha)
+    _shift_timer_warning_label.visible = _shift_timer_running and _shift_time_remaining <= 30.0
+
+
+func _shift_timer_phase() -> int:
+    if _shift_time_remaining <= 30.0:
+        return 2
+    if _shift_time_remaining <= 60.0:
+        return 1
+    return 0
+
+
+func _setup_shift_timer_audio() -> void:
+    var timer_stream := AudioStreamGenerator.new()
+    timer_stream.mix_rate = 44100.0
+    timer_stream.buffer_length = SHIFT_TIMER_BELL_BUFFER_LENGTH
+    _shift_timer_audio_player.stream = timer_stream
+    _shift_timer_audio_player.play()
+    _shift_timer_audio_playback = _shift_timer_audio_player.get_stream_playback() as AudioStreamGeneratorPlayback
+
+
+func _play_shift_timer_bell() -> void:
+    if _shift_timer_audio_playback == null:
+        return
+
+    var total_frames: int = int(SHIFT_TIMER_BELL_DURATION * 44100.0)
+    for frame_index: int in total_frames:
+        var envelope: float = 1.0 - float(frame_index) / float(maxi(total_frames, 1))
+        var sample: float = sin(TAU * SHIFT_TIMER_BELL_FREQUENCY * float(frame_index) / 44100.0) * SHIFT_TIMER_BELL_GAIN * envelope
+        _shift_timer_audio_playback.push_frame(Vector2(sample, sample))

@@ -8,6 +8,7 @@ signal game_over(ending_id: String)
 
 const FIRST_DAY: int = 1
 const FINAL_DAY: int = 14
+const SHIFT_DURATION_SECONDS: int = 90
 const ZERO_OUTPUT_FAILURE_THRESHOLD: int = 3
 const DAILY_FLAVOUR_BY_WORKER: Dictionary = {
     "Radek": {

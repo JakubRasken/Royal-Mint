@@ -126,7 +126,8 @@ func _on_assign_button_pressed() -> void:
 
 
 func _update_fatigue_display(fatigue_value: int) -> void:
-	var active_segments: int = clampi(int(ceili(float(fatigue_value) / FATIGUE_SEGMENT_STEP)), 0, _fatigue_segments.size())
+	var depleted_segments: int = clampi(int(ceili(float(fatigue_value) / FATIGUE_SEGMENT_STEP)), 0, _fatigue_segments.size())
+	var active_segments: int = _fatigue_segments.size() - depleted_segments
 
 	for segment_index: int in _fatigue_segments.size():
 		var segment: ColorRect = _fatigue_segments[segment_index]

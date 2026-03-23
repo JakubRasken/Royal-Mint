@@ -24,6 +24,7 @@ _(Codex: move a task here when you start it)_
 
 ## Done
 
+- [x] 2026-03-23 Gameplay: add mid-shift random interruptions (`commit: 183e88a`)
 - [x] 2026-03-23 Gameplay: add 90-second shift timer with urgency phases (`commit: da42145`)
 - [x] 2026-03-23 Gameplay: add active coin striking minigame to striking stage (`commit: 5c2a472`)
 - [x] 2026-03-23 UI Polish: force root control to true full-rect viewport fill (`commit: f657b72`)

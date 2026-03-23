@@ -1,4 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://g6xarrsdlss3"]
+[gd_scene load_steps=8 format=3 uid="uid://g6xarrsdlss3"]
+
+[ext_resource type="Script" path="res://scripts/minting_floor.gd" id="1_floor"]
+[ext_resource type="Script" path="res://scripts/sigismund_bar.gd" id="2_sigismund_bar"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_header_bar"]
 bg_color = Color(0.360784, 0.266667, 0.0352941, 1)
@@ -35,6 +38,7 @@ offset_right = 0.0
 offset_bottom = 0.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_floor")
 
 [node name="ScreenLayout" type="VBoxContainer" parent="."]
 anchors_preset = 15
@@ -57,6 +61,44 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_header_bar")
 [node name="HeaderContent" type="HBoxContainer" parent="ScreenLayout/HeaderBar"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
+
+[node name="LeftRatePad" type="MarginContainer" parent="ScreenLayout/HeaderBar/HeaderContent"]
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+
+[node name="GroschenRateLabel" type="Label" parent="ScreenLayout/HeaderBar/HeaderContent/LeftRatePad"]
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.960784, 0.901961, 0.698039, 1)
+theme_override_font_sizes/font_size = 16
+text = "0.0 / sec"
+vertical_alignment = 1
+
+[node name="TitleLabel" type="Label" parent="ScreenLayout/HeaderBar/HeaderContent"]
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.960784, 0.901961, 0.698039, 1)
+theme_override_font_sizes/font_size = 22
+text = "Royal Mint"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RightThreatPad" type="MarginContainer" parent="ScreenLayout/HeaderBar/HeaderContent"]
+size_flags_horizontal = 3
+theme_override_constants/margin_right = 12
+
+[node name="RightThreatAlign" type="HBoxContainer" parent="ScreenLayout/HeaderBar/HeaderContent/RightThreatPad"]
+size_flags_horizontal = 3
+alignment = 2
+
+[node name="SigismundSection" type="VBoxContainer" parent="ScreenLayout/HeaderBar/HeaderContent/RightThreatPad/RightThreatAlign"]
+
+[node name="SigismundLabel" type="Label" parent="ScreenLayout/HeaderBar/HeaderContent/RightThreatPad/RightThreatAlign/SigismundSection"]
+theme_override_colors/font_color = Color(0.960784, 0.901961, 0.698039, 1)
+theme_override_font_sizes/font_size = 11
+text = "Sigismund"
+
+[node name="SigismundBar" type="Control" parent="ScreenLayout/HeaderBar/HeaderContent/RightThreatPad/RightThreatAlign/SigismundSection"]
+custom_minimum_size = Vector2(180, 32)
+script = ExtResource("2_sigismund_bar")
 
 [node name="MainContent" type="HBoxContainer" parent="ScreenLayout"]
 size_flags_vertical = 3

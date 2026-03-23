@@ -21,9 +21,6 @@ const DAY_COUNTER_WARNING_COLOR: Color = Color("c17f24")
 const DAY_COUNTER_DANGER_COLOR: Color = Color("8b1a1a")
 const DAY_COUNTER_PULSE_MIN_ALPHA: float = 0.6
 const DAY_COUNTER_PULSE_DURATION: float = 0.6
-const SIGISMUND_SEAL_BASE_ALPHA: float = 0.2
-const SIGISMUND_SEAL_MAX_ALPHA: float = 1.0
-const SIGISMUND_SEAL_COLOR: Color = Color("8b1a1a")
 const SHIFT_GRADE_TEXT_COLOR: Color = Color("fdf6e3")
 const SHIFT_GRADE_BORDER_COLOR: Color = Color("5c4409")
 const SHIFT_GRADE_ROYAL_COLOR: Color = Color("8b6914")
@@ -56,7 +53,7 @@ const ASSAY_NORMAL_COLOR: Color = Color(1, 1, 1, 1)
 @onready var _auditor_screen = $AuditorScreen
 @onready var _day_advance_button: Button = $"ScreenLayout/BottomSection/EndShiftButton"
 @onready var _day_counter_label: Label = $ScreenLayout/HeaderBar/HeaderContent/DayCounterLabel
-@onready var _sigismund_seal: TextureRect = $ScreenLayout/HeaderBar/HeaderContent/SigismundSeal
+@onready var _sigismund_seal: Control = $ScreenLayout/HeaderBar/HeaderContent/SigismundSeal
 @onready var _shift_report_panel: PanelContainer = $"ScreenLayout/BottomSection/ShiftReport"
 @onready var _shift_report_label: Label = $"ScreenLayout/BottomSection/ShiftReport/ReportContent/ShiftReportLabel"
 @onready var _grade_stamp: PanelContainer = $"ScreenLayout/BottomSection/ShiftReport/ReportContent/GradeStamp"
@@ -124,6 +121,7 @@ func _ready() -> void:
     GameManager.day_started.connect(_on_day_started)
     GameManager.day_ended.connect(_on_day_ended)
     GameManager.game_over.connect(_on_game_over)
+    GameManager.sigismund_attention_changed.connect(_on_sigismund_attention_changed)
     EventManager.shift_interruption_triggered.connect(_on_shift_interruption_triggered)
 
     _worker_roster.set_workers(GameManager.workers)
@@ -643,22 +641,16 @@ func _update_header_day(day_num: int) -> void:
 
 
 func _update_sigismund_seal(day_num: int) -> void:
-    if day_num < 2:
+    if day_num <= 0:
         _sigismund_seal.visible = false
         return
 
-    var seal_alpha: float = lerpf(
-        SIGISMUND_SEAL_BASE_ALPHA,
-        SIGISMUND_SEAL_MAX_ALPHA,
-        clampf(float(day_num - 2) / float(GameManager.FINAL_DAY - 2), 0.0, 1.0)
-    )
     _sigismund_seal.visible = true
-    _sigismund_seal.modulate = Color(
-        SIGISMUND_SEAL_COLOR.r,
-        SIGISMUND_SEAL_COLOR.g,
-        SIGISMUND_SEAL_COLOR.b,
-        seal_alpha
-    )
+    _sigismund_seal.call("set_attention_level", GameManager.get_sigismund_attention())
+
+
+func _on_sigismund_attention_changed(_level: int) -> void:
+    _update_sigismund_seal(GameManager.current_day)
 
 
 func _build_shift_grade_stamp(quality_grade: String) -> StyleBoxFlat:

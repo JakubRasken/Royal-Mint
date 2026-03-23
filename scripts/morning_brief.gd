@@ -30,6 +30,8 @@ func show_brief(day_num: int, active_event: GameEvent) -> void:
         ) % day_num
         if day_num == 1:
             _narrative_label.text += " A courier passed through last night bearing Sigismund's colours. No message. Just watching."
+        if day_num == 13 and GameManager.is_sigismund_attention_maxed():
+            _narrative_label.text += " Sigismund's men were seen outside the gates last night."
         _choice_row.visible = false
         _begin_shift_button.disabled = false
         return

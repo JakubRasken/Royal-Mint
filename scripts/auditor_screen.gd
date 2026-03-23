@@ -8,6 +8,7 @@ extends CanvasLayer
 
 func show_result(ending_id: String, snapshot: Dictionary) -> void:
     visible = true
+    var sigismund_official_present: bool = GameManager.is_sigismund_attention_maxed()
 
     if ending_id == "ledger_bankrupt":
         _result_title.text = "The treasury runs dry"
@@ -34,22 +35,36 @@ func show_result(ending_id: String, snapshot: Dictionary) -> void:
         return
 
     if ending_id == "audit_pass":
-        _result_title.text = "Royal auditor's report - Passed"
+        _result_title.text = (
+            "Sigismund's official report - Passed"
+            if sigismund_official_present
+            else "Royal auditor's report - Passed"
+        )
         _result_summary.text = (
             "The Crown accepts your books. Quota stands at %d / %d, and the "
             + "ledger remains fit for inspection."
         ) % [int(snapshot["cumulative_output"]), int(snapshot["cumulative_target"])]
+        if sigismund_official_present:
+            _result_summary.text += " Sigismund's man watches every mark, but finds no open fault."
         return
 
-    _result_title.text = "Royal auditor's report - Failed"
+    _result_title.text = (
+        "Sigismund's official report - Failed"
+        if sigismund_official_present
+        else "Royal auditor's report - Failed"
+    )
     if not bool(snapshot["ledger_clean"]):
         _result_summary.text = (
             "The auditor rejects your work. Quota stands at %d / %d, and the "
             + "ledger carries the stain of irregular minting."
         ) % [int(snapshot["cumulative_output"]), int(snapshot["cumulative_target"])]
+        if sigismund_official_present:
+            _result_summary.text += " The scrutiny is colder now, and every stain reads like treason."
         return
 
     _result_summary.text = (
         "The auditor rejects your work. Quota stands at %d / %d, and the Crown "
         + "finds your output wanting even if the books remain clean."
     ) % [int(snapshot["cumulative_output"]), int(snapshot["cumulative_target"])]
+    if sigismund_official_present:
+        _result_summary.text += " Sigismund's official offers no mercy for a weak tally."

@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://g6xarrsdlss3"]
+[gd_scene load_steps=23 format=3 uid="uid://g6xarrsdlss3"]
 
 [ext_resource type="PackedScene" path="res://scenes/PipelineStageSlot.tscn" id="1_stage"]
 [ext_resource type="PackedScene" path="res://scenes/LedgerPanel.tscn" id="2_ledger"]
@@ -8,9 +8,9 @@
 [ext_resource type="Script" path="res://scripts/minting_floor.gd" id="6_floor"]
 [ext_resource type="Texture2D" path="res://assets/ui/logo_coin_gold.svg" id="7_logo"]
 [ext_resource type="Texture2D" path="res://assets/ui/background_mint_floor.png" id="8_background"]
-[ext_resource type="Texture2D" path="res://assets/sprites/icon_stat_loyalty.png" id="9_seal"]
 [ext_resource type="Script" path="res://scripts/candlelight_vignette.gd" id="10_vignette"]
 [ext_resource type="Script" path="res://scripts/shift_timer_bar.gd" id="11_shift_timer"]
+[ext_resource type="Script" path="res://scripts/sigismund_seal.gd" id="12_sigismund_seal"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
 bg_color = Color(0.960784, 0.901961, 0.698039, 1)
@@ -185,6 +185,12 @@ text = "Royal Mint"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="SigismundSeal" type="Control" parent="ScreenLayout/HeaderBar/HeaderContent"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("12_sigismund_seal")
+
 [node name="DayCounterLabel" type="Label" parent="ScreenLayout/HeaderBar/HeaderContent"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.960784, 0.901961, 0.698039, 1)
@@ -192,16 +198,6 @@ theme_override_font_sizes/font_size = 22
 text = "Day 1 / 14"
 horizontal_alignment = 2
 vertical_alignment = 1
-
-[node name="SigismundSeal" type="TextureRect" parent="ScreenLayout/HeaderBar/HeaderContent"]
-visible = false
-custom_minimum_size = Vector2(28, 28)
-layout_mode = 2
-mouse_filter = 2
-modulate = Color(0.545098, 0.101961, 0.101961, 0.2)
-texture = ExtResource("9_seal")
-expand_mode = 1
-stretch_mode = 5
 
 [node name="MainContent" type="HBoxContainer" parent="ScreenLayout"]
 layout_mode = 2

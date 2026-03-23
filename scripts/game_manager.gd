@@ -5,11 +5,13 @@ extends Node
 signal day_started(day_num: int)
 signal day_ended(results: Dictionary)
 signal game_over(ending_id: String)
+signal sigismund_attention_changed(level: int)
 
 const FIRST_DAY: int = 1
 const FINAL_DAY: int = 14
 const SHIFT_DURATION_SECONDS: int = 90
 const ZERO_OUTPUT_FAILURE_THRESHOLD: int = 3
+const SIGISMUND_ATTENTION_MAX: int = 5
 const DAILY_FLAVOUR_BY_WORKER: Dictionary = {
     "Radek": {
         "idle": [
@@ -76,6 +78,7 @@ var resolved_event_summary: String = ""
 var _consecutive_zero_output_days: int = 0
 var _last_shift_results: Dictionary = {}
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
+var _sigismund_attention: int = 0
 
 
 func start_new_game() -> void:
@@ -91,8 +94,10 @@ func start_new_game() -> void:
     _load_workers()
     _consecutive_zero_output_days = 0
     _last_shift_results.clear()
+    _sigismund_attention = 0
     Ledger.reset()
     EventManager.reload_events()
+    sigismund_attention_changed.emit(_sigismund_attention)
     _start_day(FIRST_DAY)
 
 
@@ -107,6 +112,8 @@ func complete_shift(results: Dictionary) -> void:
         return
 
     _last_shift_results = results.duplicate(true)
+    if String(results.get("quality_grade", "")) == "Debased":
+        _raise_sigismund_attention()
     current_phase = GamePhase.EVENING_REPORT
 
     var merchant_grade_output: int = int(results.get("merchant_grade_or_better", 0))
@@ -148,6 +155,8 @@ func resolve_active_event(choice_id: String) -> Dictionary:
     resolved_event = active_event
     resolved_event_choice_id = choice_id
     var effects: Dictionary = EventManager.resolve_active_event(choice_id)
+    if bool(effects.get("accepts_sigismund_bribe", false)):
+        _raise_sigismund_attention()
     resolved_event_summary = _describe_event_resolution(resolved_event, choice_id, effects)
     active_event = null
     return effects
@@ -155,6 +164,14 @@ func resolve_active_event(choice_id: String) -> Dictionary:
 
 func get_last_shift_results() -> Dictionary:
     return _last_shift_results.duplicate(true)
+
+
+func get_sigismund_attention() -> int:
+    return _sigismund_attention
+
+
+func is_sigismund_attention_maxed() -> bool:
+    return _sigismund_attention >= SIGISMUND_ATTENTION_MAX
 
 
 func evaluate_worker_collapse() -> void:
@@ -243,6 +260,14 @@ func _pick_daily_flavour(worker: Worker) -> String:
         return ""
 
     return String(flavour_options[_rng.randi_range(0, flavour_options.size() - 1)])
+
+
+func _raise_sigismund_attention(amount: int = 1) -> void:
+    var next_attention: int = clampi(_sigismund_attention + maxi(amount, 0), 0, SIGISMUND_ATTENTION_MAX)
+    if next_attention == _sigismund_attention:
+        return
+    _sigismund_attention = next_attention
+    sigismund_attention_changed.emit(_sigismund_attention)
 
 
 func _describe_event_resolution(event_resource: GameEvent, choice_id: String, effects: Dictionary) -> String:

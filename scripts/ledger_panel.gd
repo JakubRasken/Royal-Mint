@@ -7,11 +7,19 @@ const BANNER_TEXT_COLOR: Color = Color("fdf6e3")
 const QUOTA_MET_COLOR: Color = Color("2a5a2a")
 const QUOTA_UNMET_COLOR: Color = Color("8b1a1a")
 const BANNER_BORDER_COLOR: Color = Color("5c4409")
+const GRACE_NOTCH_REMAINING_COLOR: Color = Color("fdf6e3")
+const GRACE_NOTCH_USED_COLOR: Color = Color("8b1a1a")
 
 @onready var _quota_label: Label = $"VBoxContainer/QuotaSection/QuotaLabel"
 @onready var _quota_bar: ProgressBar = $"VBoxContainer/QuotaSection/QuotaBar"
 @onready var _quota_status_banner: PanelContainer = $"VBoxContainer/QuotaSection/QuotaStatusBanner"
-@onready var _quota_status_label: Label = $"VBoxContainer/QuotaSection/QuotaStatusBanner/QuotaStatusLabel"
+@onready var _quota_status_label: Label = $"VBoxContainer/QuotaSection/QuotaStatusBanner/BannerContent/QuotaStatusLabel"
+@onready var _grace_notches: HBoxContainer = $"VBoxContainer/QuotaSection/QuotaStatusBanner/BannerContent/GraceNotches"
+@onready var _grace_notch_rects: Array[ColorRect] = [
+    $"VBoxContainer/QuotaSection/QuotaStatusBanner/BannerContent/GraceNotches/GraceNotch1",
+    $"VBoxContainer/QuotaSection/QuotaStatusBanner/BannerContent/GraceNotches/GraceNotch2",
+    $"VBoxContainer/QuotaSection/QuotaStatusBanner/BannerContent/GraceNotches/GraceNotch3"
+]
 @onready var _balance_value: Label = $"VBoxContainer/StatsGrid/BalanceValue"
 @onready var _days_value: Label = $"VBoxContainer/StatsGrid/DaysValue"
 
@@ -25,13 +33,21 @@ func _ready() -> void:
 
 func _on_quota_updated(current: int, target: int) -> void:
     var quota_met: bool = current >= target and target > 0
+    var quota_failure_streak: int = Ledger.get_consecutive_quota_failures()
+    var show_grace_countdown: bool = not quota_met and quota_failure_streak >= 2
     _quota_label.text = "Daily quota: %d / %d groschen" % [current, target]
     _quota_bar.max_value = maxi(target, 1)
     _quota_bar.value = clampi(current, 0, target)
-    _quota_status_label.text = "Quota met" if quota_met else "Quota unmet"
+    if quota_met:
+        _quota_status_label.text = "Quota met"
+    elif show_grace_countdown:
+        _quota_status_label.text = "Quota unmet - Day %d of grace remaining" % Ledger.get_quota_grace_remaining()
+    else:
+        _quota_status_label.text = "Quota unmet"
     _quota_status_label.modulate = Color(1, 1, 1, 1)
     _quota_status_label.add_theme_color_override("font_color", BANNER_TEXT_COLOR)
     _quota_status_banner.add_theme_stylebox_override("panel", _build_banner_stylebox(quota_met))
+    _update_grace_notches(show_grace_countdown, quota_failure_streak)
 
 
 func _on_balance_changed(amount: int) -> void:
@@ -64,3 +80,13 @@ func _build_banner_stylebox(quota_met: bool) -> StyleBoxFlat:
     stylebox.shadow_color = Color("2a1a02", 0.25)
     stylebox.shadow_size = 1
     return stylebox
+
+
+func _update_grace_notches(show_grace_countdown: bool, quota_failure_streak: int) -> void:
+    _grace_notches.visible = show_grace_countdown
+    if not show_grace_countdown:
+        return
+
+    for notch_index: int in _grace_notch_rects.size():
+        var notch: ColorRect = _grace_notch_rects[notch_index]
+        notch.color = GRACE_NOTCH_USED_COLOR if notch_index < quota_failure_streak else GRACE_NOTCH_REMAINING_COLOR

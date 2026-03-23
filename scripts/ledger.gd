@@ -8,6 +8,7 @@ signal balance_changed(amount: int)
 const QUOTA_DAYS_1_TO_4: int = 14
 const QUOTA_DAYS_5_TO_9: int = 15
 const QUOTA_DAYS_10_TO_14: int = 16
+const QUOTA_FAILURE_GRACE_DAYS: int = 3
 const STARTING_BALANCE: int = 24
 const DAILY_WAGE_BY_ROLE: Dictionary = {
     "Smelter": 3,
@@ -22,6 +23,7 @@ var _current_merchant_output: int = 0
 var _cumulative_quota_target: int = 0
 var _cumulative_merchant_output: int = 0
 var _integrity_flags: Array[String] = []
+var _consecutive_quota_failures: int = 0
 
 
 func reset(starting_balance: int = STARTING_BALANCE) -> void:
@@ -32,6 +34,7 @@ func reset(starting_balance: int = STARTING_BALANCE) -> void:
     _cumulative_quota_target = 0
     _cumulative_merchant_output = 0
     _integrity_flags.clear()
+    _consecutive_quota_failures = 0
     quota_updated.emit(_current_merchant_output, _current_quota_target)
     balance_changed.emit(_balance)
 
@@ -55,6 +58,10 @@ func get_quota_target(day_num: int) -> int:
 func set_daily_output(merchant_grade_count: int) -> void:
     _current_merchant_output = maxi(merchant_grade_count, 0)
     _cumulative_merchant_output += _current_merchant_output
+    if did_meet_daily_quota():
+        _consecutive_quota_failures = 0
+    else:
+        _consecutive_quota_failures += 1
     quota_updated.emit(_current_merchant_output, _current_quota_target)
 
 
@@ -106,6 +113,18 @@ func did_meet_cumulative_quota() -> bool:
     return _cumulative_merchant_output >= _cumulative_quota_target
 
 
+func get_consecutive_quota_failures() -> int:
+    return _consecutive_quota_failures
+
+
+func get_quota_grace_remaining() -> int:
+    return maxi(QUOTA_FAILURE_GRACE_DAYS - _consecutive_quota_failures, 0)
+
+
+func did_exhaust_quota_grace() -> bool:
+    return _consecutive_quota_failures >= QUOTA_FAILURE_GRACE_DAYS
+
+
 func get_audit_snapshot() -> Dictionary:
     return {
         "day": _current_day,
@@ -115,6 +134,7 @@ func get_audit_snapshot() -> Dictionary:
         "daily_target": _current_quota_target,
         "cumulative_output": _cumulative_merchant_output,
         "cumulative_target": _cumulative_quota_target,
+        "quota_failure_streak": _consecutive_quota_failures,
         "ledger_clean": has_clean_ledger(),
         "integrity_flags": _integrity_flags.duplicate()
     }

@@ -123,6 +123,10 @@ func complete_shift(results: Dictionary) -> void:
 
     if _consecutive_zero_output_days >= ZERO_OUTPUT_FAILURE_THRESHOLD:
         _trigger_immediate_failure("zero_output_collapse")
+        return
+
+    if Ledger.did_exhaust_quota_grace():
+        _trigger_immediate_failure("quota_grace_exhausted")
 
 
 func advance_day() -> void:

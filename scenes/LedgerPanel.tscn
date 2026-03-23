@@ -91,12 +91,38 @@ custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 clip_contents = false
 
-[node name="QuotaStatusLabel" type="Label" parent="VBoxContainer/QuotaSection/QuotaStatusBanner"]
+[node name="BannerContent" type="HBoxContainer" parent="VBoxContainer/QuotaSection/QuotaStatusBanner"]
 layout_mode = 2
+clip_contents = false
+theme_override_constants/separation = 8
+
+[node name="QuotaStatusLabel" type="Label" parent="VBoxContainer/QuotaSection/QuotaStatusBanner/BannerContent"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.992157, 0.964706, 0.890196, 1)
 theme_override_font_sizes/font_size = 14
 text = "Quota unmet"
 horizontal_alignment = 1
+
+[node name="GraceNotches" type="HBoxContainer" parent="VBoxContainer/QuotaSection/QuotaStatusBanner/BannerContent"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="GraceNotch1" type="ColorRect" parent="VBoxContainer/QuotaSection/QuotaStatusBanner/BannerContent/GraceNotches"]
+custom_minimum_size = Vector2(10, 14)
+layout_mode = 2
+color = Color(0.992157, 0.964706, 0.890196, 1)
+
+[node name="GraceNotch2" type="ColorRect" parent="VBoxContainer/QuotaSection/QuotaStatusBanner/BannerContent/GraceNotches"]
+custom_minimum_size = Vector2(10, 14)
+layout_mode = 2
+color = Color(0.992157, 0.964706, 0.890196, 1)
+
+[node name="GraceNotch3" type="ColorRect" parent="VBoxContainer/QuotaSection/QuotaStatusBanner/BannerContent/GraceNotches"]
+custom_minimum_size = Vector2(10, 14)
+layout_mode = 2
+color = Color(0.992157, 0.964706, 0.890196, 1)
 
 [node name="StatsGrid" type="GridContainer" parent="VBoxContainer"]
 layout_mode = 2

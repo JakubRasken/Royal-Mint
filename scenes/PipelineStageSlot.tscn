@@ -123,6 +123,7 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="WorkerPortrait" type="TextureRect" parent="VBoxContainer/WorkerSlot"]
+unique_name_in_owner = true
 layout_mode = 2
 custom_minimum_size = Vector2(64, 64)
 texture_filter = 1
@@ -163,6 +164,7 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="OutputIcon" type="TextureRect" parent="VBoxContainer/OutputPreview"]
+unique_name_in_owner = true
 layout_mode = 2
 custom_minimum_size = Vector2(32, 32)
 texture_filter = 1

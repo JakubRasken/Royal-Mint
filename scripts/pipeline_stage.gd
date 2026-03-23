@@ -8,9 +8,9 @@ signal worker_removed(stage_id: String)
 
 const EMPTY_PORTRAIT_TEXTURE: Texture2D = preload("res://assets/sprites/portrait_empty_slot.png")
 const STAGE_ICON_BY_ID: Dictionary = {
-    "smelting": preload("res://assets/sprites/icon_stage_smelting.png"),
-    "striking": preload("res://assets/sprites/icon_stage_striking.png"),
-    "assay": preload("res://assets/sprites/icon_stage_assay.png")
+	"smelting": preload("res://assets/sprites/icon_stage_smelting.png"),
+	"striking": preload("res://assets/sprites/icon_stage_striking.png"),
+	"assay": preload("res://assets/sprites/icon_stage_assay.png")
 }
 const EMPTY_WORKER_NAME: String = "Unassigned"
 const EMPTY_OUTPUT_TEXT: String = "~0 coins / shift"
@@ -34,11 +34,11 @@ const FATIGUE_HIGH_COLOR: Color = Color(0.5451, 0.1020, 0.1020, 1.0)
 @onready var _output_icon: TextureRect = %OutputIcon
 @onready var _output_label: Label = %OutputLabel
 @onready var _fatigue_segments: Array[ColorRect] = [
-    %FatigueSegment1,
-    %FatigueSegment2,
-    %FatigueSegment3,
-    %FatigueSegment4,
-    %FatigueSegment5
+	%FatigueSegment1,
+	%FatigueSegment2,
+	%FatigueSegment3,
+	%FatigueSegment4,
+	%FatigueSegment5
 ]
 
 var _assigned_worker: Worker
@@ -47,98 +47,98 @@ var _support_preview_output: int = 0
 
 
 func _ready() -> void:
-    _assign_button.pressed.connect(_on_assign_button_pressed)
-    _refresh_display()
+	_assign_button.pressed.connect(_on_assign_button_pressed)
+	_refresh_display()
 
 
 func assign_worker(worker: Worker) -> void:
-    if worker == null:
-        return
+	if worker == null:
+		return
 
-    _assigned_worker = worker
-    _refresh_display()
-    worker_assigned.emit(stage_id, worker)
+	_assigned_worker = worker
+	_refresh_display()
+	worker_assigned.emit(stage_id, worker)
 
 
 func remove_worker() -> void:
-    if _assigned_worker == null:
-        return
+	if _assigned_worker == null:
+		return
 
-    _assigned_worker = null
-    _refresh_display()
-    worker_removed.emit(stage_id)
+	_assigned_worker = null
+	_refresh_display()
+	worker_removed.emit(stage_id)
 
 
 func set_output_preview(estimated_coins: int) -> void:
-    _output_label.text = "~%d coins / shift" % maxi(estimated_coins, 0)
+	_output_label.text = "~%d coins / shift" % maxi(estimated_coins, 0)
 
 
 func set_support_preview(estimated_coins: int) -> void:
-    _support_preview_output = maxi(estimated_coins, 0)
-    if _assigned_worker == null:
-        _refresh_display()
+	_support_preview_output = maxi(estimated_coins, 0)
+	if _assigned_worker == null:
+		_refresh_display()
 
 
 func set_assignment_pending(is_pending: bool) -> void:
-    _assignment_pending = is_pending
-    _refresh_display()
+	_assignment_pending = is_pending
+	_refresh_display()
 
 
 func refresh_worker_state() -> void:
-    _refresh_display()
+	_refresh_display()
 
 
 func get_assigned_worker() -> Worker:
-    return _assigned_worker
+	return _assigned_worker
 
 
 func _refresh_display() -> void:
-    _stage_name_label.text = stage_name
-    _output_icon.texture = STAGE_ICON_BY_ID.get(stage_id) as Texture2D
+	_stage_name_label.text = stage_name
+	_output_icon.texture = STAGE_ICON_BY_ID.get(stage_id) as Texture2D
 
-    if _assigned_worker == null:
-        _worker_portrait.texture = EMPTY_PORTRAIT_TEXTURE
-        _worker_name_label.text = EMPTY_WORKER_NAME
-        _assign_button.text = PICK_WORKER_TEXT if _assignment_pending else ASSIGN_BUTTON_TEXT
-        _assign_button.disabled = false
-        if _assignment_pending:
-            _output_label.text = "Select a worker from the roster"
-        elif _support_preview_output > 0:
-            _output_label.text = "~%d coins / shift with floor hands" % _support_preview_output
-        else:
-            _output_label.text = EMPTY_OUTPUT_TEXT
-        _update_fatigue_display(0)
-        self_modulate = ACTIVE_STAGE_MODULATE if _assignment_pending else Color(1, 1, 1, 1)
-        return
+	if _assigned_worker == null:
+		_worker_portrait.texture = EMPTY_PORTRAIT_TEXTURE
+		_worker_name_label.text = EMPTY_WORKER_NAME
+		_assign_button.text = PICK_WORKER_TEXT if _assignment_pending else ASSIGN_BUTTON_TEXT
+		_assign_button.disabled = false
+		if _assignment_pending:
+			_output_label.text = "Select a worker from the roster"
+		elif _support_preview_output > 0:
+			_output_label.text = "~%d coins / shift with floor hands" % _support_preview_output
+		else:
+			_output_label.text = EMPTY_OUTPUT_TEXT
+		_update_fatigue_display(0)
+		self_modulate = ACTIVE_STAGE_MODULATE if _assignment_pending else Color(1, 1, 1, 1)
+		return
 
-    _worker_portrait.texture = _assigned_worker.portrait if _assigned_worker.portrait != null else EMPTY_PORTRAIT_TEXTURE
-    _worker_name_label.text = _assigned_worker.worker_name
-    _assign_button.text = REMOVE_BUTTON_TEXT
-    _assign_button.disabled = false
-    _update_fatigue_display(_assigned_worker.fatigue)
-    self_modulate = Color(1, 1, 1, 1)
+	_worker_portrait.texture = _assigned_worker.portrait if _assigned_worker.portrait != null else EMPTY_PORTRAIT_TEXTURE
+	_worker_name_label.text = _assigned_worker.worker_name
+	_assign_button.text = REMOVE_BUTTON_TEXT
+	_assign_button.disabled = false
+	_update_fatigue_display(_assigned_worker.fatigue)
+	self_modulate = Color(1, 1, 1, 1)
 
 
 func _on_assign_button_pressed() -> void:
-    if _assigned_worker != null:
-        remove_worker()
-        return
+	if _assigned_worker != null:
+		remove_worker()
+		return
 
-    assignment_requested.emit(stage_id)
+	assignment_requested.emit(stage_id)
 
 
 func _update_fatigue_display(fatigue_value: int) -> void:
-    var active_segments: int = clampi(int(ceili(float(fatigue_value) / FATIGUE_SEGMENT_STEP)), 0, _fatigue_segments.size())
+	var active_segments: int = clampi(int(ceili(float(fatigue_value) / FATIGUE_SEGMENT_STEP)), 0, _fatigue_segments.size())
 
-    for segment_index: int in _fatigue_segments.size():
-        var segment: ColorRect = _fatigue_segments[segment_index]
-        if segment_index >= active_segments:
-            segment.color = FATIGUE_INACTIVE_COLOR
-            continue
+	for segment_index: int in _fatigue_segments.size():
+		var segment: ColorRect = _fatigue_segments[segment_index]
+		if segment_index >= active_segments:
+			segment.color = FATIGUE_INACTIVE_COLOR
+			continue
 
-        if segment_index <= 1:
-            segment.color = FATIGUE_LOW_COLOR
-        elif segment_index <= 3:
-            segment.color = FATIGUE_MID_COLOR
-        else:
-            segment.color = FATIGUE_HIGH_COLOR
+		if segment_index <= 1:
+			segment.color = FATIGUE_LOW_COLOR
+		elif segment_index <= 3:
+			segment.color = FATIGUE_MID_COLOR
+		else:
+			segment.color = FATIGUE_HIGH_COLOR

@@ -24,6 +24,9 @@ _(Codex: move a task here when you start it)_
 
 ## Done
 
+- [x] 2026-03-23 UI Polish: restore header to top of layout flow (`commit: 4fef615`)
+- [x] 2026-03-23 UI Polish: correct fatigue bar fill direction (`commit: 79dbb68`)
+- [x] 2026-03-23 UI Polish: push roster watermark behind worker rows (`commit: 5a7c193`)
 - [x] 2026-03-23 UI Polish: fix viewport scaling and unclipped layout (`commit: 498da42`)
 - [x] 2026-03-23 UI Polish: add manuscript header bar (`commit: 7021146`)
 - [x] 2026-03-23 UI Polish: reshape fatigue bars as candle segments (`commit: 17d6fd5`)

@@ -24,6 +24,7 @@ _(Codex: move a task here when you start it)_
 
 ## Done
 
+- [x] 2026-03-23 Gameplay: add active coin striking minigame to striking stage (`commit: pending current gameplay commit`)
 - [x] 2026-03-23 UI Polish: force root control to true full-rect viewport fill (`commit: f657b72`)
 - [x] 2026-03-23 UI Polish: prevent shift report from being obscured by end shift button (`commit: e0e5076`)
 - [x] 2026-03-23 UI Polish: add animated day urgency to header (`commit: f08000b`)

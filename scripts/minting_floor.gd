@@ -77,6 +77,7 @@ func _connect_stage_signals() -> void:
         var stage_node = _stage_nodes[stage_id]
         stage_node.assignment_requested.connect(_on_stage_assignment_requested)
         stage_node.worker_removed.connect(_on_stage_worker_removed)
+        stage_node.worker_state_changed.connect(_on_stage_worker_state_changed)
 
 
 func _on_stage_assignment_requested(stage_id: String) -> void:
@@ -123,12 +124,17 @@ func _on_worker_rest_toggled(worker: Worker) -> void:
     _worker_roster.refresh()
 
 
+func _on_stage_worker_state_changed(_stage_id: String, _worker: Worker) -> void:
+    _worker_roster.refresh()
+
+
 func _on_begin_shift_requested() -> void:
     if GameManager.active_event != null:
         return
 
     _pending_stage_id = ""
     GameManager.begin_shift()
+    _set_stage_shift_active(true)
     _morning_brief.hide_brief()
     _update_day_button_for_phase()
 
@@ -151,6 +157,7 @@ func _on_day_advance_pressed() -> void:
 
 func _on_day_started(day_num: int) -> void:
     _pending_stage_id = ""
+    _set_stage_shift_active(false)
     _clear_incapacitated_assignments()
     _update_header_day(day_num)
     _morning_brief.show_brief(day_num, GameManager.active_event)
@@ -166,6 +173,7 @@ func _on_day_ended(_results: Dictionary) -> void:
 
 
 func _on_game_over(ending_id: String) -> void:
+    _set_stage_shift_active(false)
     _day_advance_button.visible = false
     _morning_brief.hide_brief()
     _auditor_screen.show_result(ending_id, Ledger.get_audit_snapshot())
@@ -183,6 +191,13 @@ func _complete_current_shift() -> void:
             stage_outputs.append(FLOOR_HAND_OUTPUT)
             quality_scores.append(FLOOR_HAND_QUALITY)
             floor_hands_used += 1
+            continue
+
+        if stage_id == "striking":
+            var striking_stage = _stage_nodes[stage_id]
+            var striking_results: Dictionary = striking_stage.get_shift_results()
+            stage_outputs.append(int(striking_results.get("coins_struck", 0)))
+            quality_scores.append(float(striking_results.get("average_quality", 0.0)))
             continue
 
         var output: int = _calculate_worker_output(worker)
@@ -204,6 +219,7 @@ func _complete_current_shift() -> void:
     var income_earned: int = merchant_or_better * GROSCHEN_VALUE_PER_MERCHANT_COIN
     Ledger.add_income(income_earned)
     var wages_paid: int = Ledger.apply_daily_wages(GameManager.workers)
+    _set_stage_shift_active(false)
     GameManager.complete_shift({
         "total_output": total_output,
         "merchant_grade_or_better": merchant_or_better,
@@ -310,6 +326,7 @@ func _clear_pending_stage_assignment(stage_id: String = "") -> void:
 
 
 func _resume_from_game_state() -> void:
+    _set_stage_shift_active(GameManager.current_phase == GameManager.GamePhase.SHIFT)
     _clear_incapacitated_assignments()
     _update_header_day(GameManager.current_day)
     _refresh_stage_previews()
@@ -462,3 +479,9 @@ func _clear_incapacitated_assignments() -> void:
         var worker: Worker = GameManager.stage_assignments.get(stage_id) as Worker
         if worker != null and worker.is_incapacitated():
             GameManager.stage_assignments.erase(stage_id)
+
+
+func _set_stage_shift_active(is_active: bool) -> void:
+    for stage_id: String in _stage_nodes.keys():
+        var stage_node = _stage_nodes[stage_id]
+        stage_node.set_shift_active(is_active)

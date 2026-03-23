@@ -21,6 +21,12 @@ const DAY_COUNTER_WARNING_COLOR: Color = Color("c17f24")
 const DAY_COUNTER_DANGER_COLOR: Color = Color("8b1a1a")
 const DAY_COUNTER_PULSE_MIN_ALPHA: float = 0.6
 const DAY_COUNTER_PULSE_DURATION: float = 0.6
+const SHIFT_GRADE_TEXT_COLOR: Color = Color("fdf6e3")
+const SHIFT_GRADE_BORDER_COLOR: Color = Color("5c4409")
+const SHIFT_GRADE_ROYAL_COLOR: Color = Color("8b6914")
+const SHIFT_GRADE_MERCHANT_COLOR: Color = Color("2a5a2a")
+const SHIFT_GRADE_COMMON_COLOR: Color = Color("c17f24")
+const SHIFT_GRADE_DEBASED_COLOR: Color = Color("8b1a1a")
 
 @onready var _stage_nodes: Dictionary = {
     "smelting": $"ScreenLayout/MainContent/LeftPanel/StageContainer/PipelineStage_Smelting",
@@ -33,7 +39,10 @@ const DAY_COUNTER_PULSE_DURATION: float = 0.6
 @onready var _day_advance_button: Button = $"ScreenLayout/BottomSection/EndShiftButton"
 @onready var _day_counter_label: Label = $ScreenLayout/HeaderBar/HeaderContent/DayCounterLabel
 @onready var _shift_report_panel: PanelContainer = $"ScreenLayout/BottomSection/ShiftReport"
-@onready var _shift_report_label: Label = $"ScreenLayout/BottomSection/ShiftReport/ShiftReportLabel"
+@onready var _shift_report_label: Label = $"ScreenLayout/BottomSection/ShiftReport/ReportContent/ShiftReportLabel"
+@onready var _grade_stamp: PanelContainer = $"ScreenLayout/BottomSection/ShiftReport/ReportContent/GradeStamp"
+@onready var _grade_stamp_label: Label = $"ScreenLayout/BottomSection/ShiftReport/ReportContent/GradeStamp/GradeStampLabel"
+@onready var _shift_report_detail: Label = $"ScreenLayout/BottomSection/ShiftReport/ReportContent/ShiftReportDetail"
 
 var _pending_stage_id: String = ""
 var _day_counter_tween: Tween
@@ -335,9 +344,9 @@ func _refresh_assignment_feedback() -> void:
 
 func _show_waiting_shift_report() -> void:
     _shift_report_panel.visible = true
-    _shift_report_label.text = (
-        "Shift report: No shift completed yet for Day %d. Assign the floor, mind the fatigue, and strike enough merchant-grade coin to satisfy the Crown."
-    ) % GameManager.current_day
+    _grade_stamp.visible = false
+    _shift_report_label.text = "No shift completed yet for Day %d." % GameManager.current_day
+    _shift_report_detail.text = "Assign the floor, mind the fatigue, and strike enough merchant-grade coin to satisfy the Crown."
 
 
 func _show_shift_report(results: Dictionary) -> void:
@@ -345,23 +354,11 @@ func _show_shift_report(results: Dictionary) -> void:
     var total_output: int = int(results.get("total_output", 0))
     var merchant_output: int = int(results.get("merchant_grade_or_better", 0))
     var quality_grade: String = String(results.get("quality_grade", "Debased"))
-    var quota_met: bool = Ledger.did_meet_daily_quota()
-    var floor_hands_used: int = int(results.get("floor_hands_used", 0))
-    var wages_paid: int = int(results.get("wages_paid", 0))
-    var net_result: int = int(results.get("net_result", 0))
-
-    var report_parts: Array[String] = [
-        "Evening report - Day %d." % GameManager.current_day,
-        "%d coins struck." % total_output,
-        "%d counted toward quota at %s grade." % [merchant_output, quality_grade],
-        "Quota %s." % ("met" if quota_met else "unmet"),
-        "Wages cost %d groschen." % wages_paid,
-        "Net %s%d." % ["+" if net_result >= 0 else "-", abs(net_result)],
-        "Balance stands at %d groschen." % Ledger.get_balance()
-    ]
-    if floor_hands_used > 0:
-        report_parts.insert(1, "Floor hands covered %d stage(s)." % floor_hands_used)
-    _shift_report_label.text = " ".join(report_parts)
+    _shift_report_label.text = "%d coins struck. %d counted toward quota." % [total_output, merchant_output]
+    _grade_stamp.visible = true
+    _grade_stamp_label.text = "%s grade" % quality_grade
+    _grade_stamp.add_theme_stylebox_override("panel", _build_shift_grade_stamp(quality_grade))
+    _shift_report_detail.text = _grade_flavour_comment(quality_grade)
 
 
 func _update_header_day(day_num: int) -> void:
@@ -391,6 +388,48 @@ func _update_header_day(day_num: int) -> void:
         return
 
     _day_counter_label.add_theme_color_override("font_color", DAY_COUNTER_SAFE_COLOR)
+
+
+func _build_shift_grade_stamp(quality_grade: String) -> StyleBoxFlat:
+    var stylebox := StyleBoxFlat.new()
+    stylebox.bg_color = _grade_stamp_color(quality_grade)
+    stylebox.border_color = SHIFT_GRADE_BORDER_COLOR
+    stylebox.border_width_left = 2
+    stylebox.border_width_top = 2
+    stylebox.border_width_right = 2
+    stylebox.border_width_bottom = 2
+    stylebox.content_margin_left = 8.0
+    stylebox.content_margin_top = 5.0
+    stylebox.content_margin_right = 8.0
+    stylebox.content_margin_bottom = 5.0
+    stylebox.shadow_color = Color("2a1a02", 0.25)
+    stylebox.shadow_size = 1
+    _grade_stamp_label.add_theme_color_override("font_color", SHIFT_GRADE_TEXT_COLOR)
+    return stylebox
+
+
+func _grade_stamp_color(quality_grade: String) -> Color:
+    match quality_grade:
+        "Royal":
+            return SHIFT_GRADE_ROYAL_COLOR
+        "Merchant":
+            return SHIFT_GRADE_MERCHANT_COLOR
+        "Common":
+            return SHIFT_GRADE_COMMON_COLOR
+        _:
+            return SHIFT_GRADE_DEBASED_COLOR
+
+
+func _grade_flavour_comment(quality_grade: String) -> String:
+    match quality_grade:
+        "Royal":
+            return "The groschen ring true."
+        "Merchant":
+            return "Passable work. The Crown expects more."
+        "Common":
+            return "Sloppy. The assayer is unhappy."
+        _:
+            return "These would shame a beggar. The auditor cannot see these."
 
 
 func _clear_incapacitated_assignments() -> void:

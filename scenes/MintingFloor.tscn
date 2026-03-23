@@ -247,11 +247,35 @@ size_flags_horizontal = 3
 clip_contents = false
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="ShiftReportLabel" type="Label" parent="ScreenLayout/BottomSection/ShiftReport"]
+[node name="ReportContent" type="VBoxContainer" parent="ScreenLayout/BottomSection/ShiftReport"]
+layout_mode = 2
+clip_contents = false
+theme_override_constants/separation = 6
+
+[node name="ShiftReportLabel" type="Label" parent="ScreenLayout/BottomSection/ShiftReport/ReportContent"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.133333, 0.133333, 0.133333, 1)
 theme_override_font_sizes/font_size = 15
 text = "No shift completed yet. Assign the floor and prepare the day's output."
+autowrap_mode = 3
+
+[node name="GradeStamp" type="PanelContainer" parent="ScreenLayout/BottomSection/ShiftReport/ReportContent"]
+visible = false
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+clip_contents = false
+
+[node name="GradeStampLabel" type="Label" parent="ScreenLayout/BottomSection/ShiftReport/ReportContent/GradeStamp"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.992157, 0.964706, 0.890196, 1)
+theme_override_font_sizes/font_size = 14
+text = "Merchant grade"
+horizontal_alignment = 1
+
+[node name="ShiftReportDetail" type="Label" parent="ScreenLayout/BottomSection/ShiftReport/ReportContent"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+text = "Keep the furnaces hot and the dies true."
 autowrap_mode = 3
 
 [node name="Background" type="TextureRect" parent="."]

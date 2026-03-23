@@ -1,4 +1,27 @@
-[gd_scene format=3 uid="uid://g6xarrsdlss3"]
+[gd_scene load_steps=6 format=3 uid="uid://g6xarrsdlss3"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_header_bar"]
+bg_color = Color(0.360784, 0.266667, 0.0352941, 1)
+border_width_bottom = 2
+border_color = Color(0.545098, 0.411765, 0.0784314, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_left_panel"]
+bg_color = Color(0.992157, 0.964706, 0.890196, 1)
+border_width_right = 2
+border_color = Color(0.545098, 0.411765, 0.0784314, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_coin_panel"]
+bg_color = Color(0.960784, 0.901961, 0.698039, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_right_panel"]
+bg_color = Color(0.992157, 0.964706, 0.890196, 1)
+border_width_left = 2
+border_color = Color(0.545098, 0.411765, 0.0784314, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bottom_bar"]
+bg_color = Color(0.164706, 0.101961, 0.00784314, 1)
+border_width_top = 2
+border_color = Color(0.545098, 0.411765, 0.0784314, 1)
 
 [node name="MintingFloor" type="Control"]
 anchors_preset = 15
@@ -12,3 +35,149 @@ offset_right = 0.0
 offset_bottom = 0.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="ScreenLayout" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HeaderBar" type="PanelContainer" parent="ScreenLayout"]
+custom_minimum_size = Vector2(0, 56)
+size_flags_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_header_bar")
+
+[node name="HeaderContent" type="HBoxContainer" parent="ScreenLayout/HeaderBar"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MainContent" type="HBoxContainer" parent="ScreenLayout"]
+size_flags_vertical = 3
+
+[node name="LeftPanel" type="VBoxContainer" parent="ScreenLayout/MainContent"]
+custom_minimum_size = Vector2(220, 0)
+size_flags_horizontal = 0
+size_flags_vertical = 3
+
+[node name="LeftPanelShell" type="Panel" parent="ScreenLayout/MainContent/LeftPanel"]
+anchors_preset = 15
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
+z_index = -1
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_left_panel")
+
+[node name="FurnaceSection" type="PanelContainer" parent="ScreenLayout/MainContent/LeftPanel"]
+visible = false
+size_flags_horizontal = 3
+
+[node name="WorkerStrip" type="VBoxContainer" parent="ScreenLayout/MainContent/LeftPanel"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CoinPanel" type="CenterContainer" parent="ScreenLayout/MainContent"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CoinPanelShell" type="Panel" parent="ScreenLayout/MainContent/CoinPanel"]
+anchors_preset = 15
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
+z_index = -1
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_coin_panel")
+
+[node name="CoinContainer" type="VBoxContainer" parent="ScreenLayout/MainContent/CoinPanel"]
+
+[node name="RightPanel" type="ScrollContainer" parent="ScreenLayout/MainContent"]
+custom_minimum_size = Vector2(280, 0)
+size_flags_horizontal = 0
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_right_panel")
+
+[node name="UpgradeList" type="VBoxContainer" parent="ScreenLayout/MainContent/RightPanel"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="BottomBar" type="PanelContainer" parent="ScreenLayout"]
+custom_minimum_size = Vector2(0, 40)
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_bottom_bar")
+
+[node name="BottomContent" type="HBoxContainer" parent="ScreenLayout/BottomBar"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SeizureOverlay" type="CanvasLayer" parent="."]
+visible = false
+layer = 100
+
+[node name="SeizureDimmer" type="ColorRect" parent="SeizureOverlay"]
+anchors_preset = 15
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+color = Color(0.545098, 0.101961, 0.101961, 0.7)
+
+[node name="SeizurePanel" type="PanelContainer" parent="SeizureOverlay"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -120.0
+offset_right = 240.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SeizureContent" type="VBoxContainer" parent="SeizureOverlay/SeizurePanel"]
+
+[node name="AssayOverlay" type="CanvasLayer" parent="."]
+visible = false
+layer = 50
+
+[node name="AssayPanel" type="PanelContainer" parent="AssayOverlay"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -120.0
+offset_right = 240.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AssayContent" type="VBoxContainer" parent="AssayOverlay/AssayPanel"]

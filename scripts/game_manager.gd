@@ -54,6 +54,11 @@ const JIRI_GOOF_MIN_INTERVAL_SEC: float = 25.0
 const JIRI_GOOF_MAX_INTERVAL_SEC: float = 40.0
 const VANEK_SKIM_MIN_INTERVAL_SEC: float = 45.0
 const VANEK_SKIM_MAX_INTERVAL_SEC: float = 75.0
+const JOURNAL_FIRST_CLICK: String = "Cold hammer. Cold room. Let's see what you're worth."
+const JOURNAL_FULL_FLOOR: String = "The floor is full. For the first time, the Italian Court sounds like a mint."
+const JOURNAL_AGENT_REFUSED: String = "His agent left without a word. That worries me more than a threat would."
+const JOURNAL_PRESTIGE: String = "They took the mint. But they couldn't take what I know."
+const JOURNAL_SECOND_RUN: String = "Cold room. Bare anvil. Again."
 
 var groschen: float = 0.0
 var total_groschen_spent: float = 0.0
@@ -90,6 +95,9 @@ var _milota_rest_time_remaining: float = 0.0
 var _milota_rest_cooldown_remaining: float = MILOTA_REST_INTERVAL_SEC
 var _vanek_skim_cooldown_remaining: float = -1.0
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
+var _first_click_journal_emitted: bool = false
+var _full_floor_journal_emitted: bool = false
+var _second_run_journal_emitted: bool = false
 
 var workers_hired: Array[Worker] = []
 
@@ -116,6 +124,13 @@ func _process(delta: float) -> void:
 
 
 func click_coin() -> void:
+    if _prestige_count > 0 and not _second_run_journal_emitted and _click_count == 0:
+        _second_run_journal_emitted = true
+        journal_entry.emit(JOURNAL_SECOND_RUN)
+    elif not _first_click_journal_emitted and _click_count == 0 and _prestige_count == 0:
+        _first_click_journal_emitted = true
+        journal_entry.emit(JOURNAL_FIRST_CLICK)
+
     var current_time: float = Time.get_ticks_msec() / 1000.0
     if current_time - _last_click_time <= _combo_window_sec:
         _combo_count = mini(_combo_count + 1, COMBO_MAX)
@@ -152,6 +167,9 @@ func hire_worker(worker: Worker) -> void:
         _vanek_skim_cooldown_remaining = _next_vanek_skim_interval()
     if not worker.hire_journal.is_empty():
         journal_entry.emit(worker.hire_journal)
+    if workers_hired.size() >= FULL_FLOOR_WORKER_COUNT and not _full_floor_journal_emitted:
+        _full_floor_journal_emitted = true
+        journal_entry.emit(JOURNAL_FULL_FLOOR)
     _refresh_passive_income()
     _emit_economy_state()
     worker_hired.emit(worker)
@@ -206,6 +224,12 @@ func pay_sigismund(amount: float) -> void:
     journal_entry.emit("I told myself it was just this once.")
 
 
+func refuse_sigismund() -> void:
+    sigismund_threat = minf(sigismund_threat + THREAT_REFUSE_INCREASE, SEIZURE_THRESHOLD)
+    threat_updated.emit(sigismund_threat)
+    journal_entry.emit(JOURNAL_AGENT_REFUSED)
+
+
 func fire_seizure() -> void:
     var prestige_bonus: float = minf(
         BASE_LEGACY_MULTIPLIER + total_groschen_earned / LEGACY_EARNINGS_DIVISOR,
@@ -240,6 +264,8 @@ func fire_seizure() -> void:
     _vlassky_dvur_unlocked = false
     _iron_discipline_unlocked = false
     _persistent_passive_after_seizure = seizure_passive_carryover
+    _full_floor_journal_emitted = false
+    _second_run_journal_emitted = false
     _jiri_goof_time_remaining = 0.0
     _jiri_goof_cooldown_remaining = -1.0
     _milota_rest_time_remaining = 0.0
@@ -253,7 +279,7 @@ func fire_seizure() -> void:
     _refresh_passive_income()
     _emit_economy_state()
     threat_updated.emit(sigismund_threat)
-    journal_entry.emit("They took the mint. But they couldn't take what I know.")
+    journal_entry.emit(JOURNAL_PRESTIGE)
     seizure_fired.emit(prestige_bonus)
 
 
@@ -280,6 +306,11 @@ func get_combo_multiplier() -> float:
 
 func get_combo_window_seconds() -> float:
     return _combo_window_sec
+
+
+func get_clicks_until_next_crit() -> int:
+    var clicks_remaining: int = _crit_interval - (_click_count % _crit_interval)
+    return _crit_interval if clicks_remaining == 0 else clicks_remaining
 
 
 func _add_earned_groschen(amount: float) -> void:

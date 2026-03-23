@@ -193,9 +193,44 @@ custom_minimum_size = Vector2(0, 40)
 size_flags_vertical = 8
 theme_override_styles/panel = SubResource("StyleBoxFlat_bottom_bar")
 
-[node name="BottomContent" type="HBoxContainer" parent="ScreenLayout/BottomBar"]
+[node name="BottomPad" type="MarginContainer" parent="ScreenLayout/BottomBar"]
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="BottomContent" type="HBoxContainer" parent="ScreenLayout/BottomBar/BottomPad"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="GroschenSecDetail" type="Label" parent="ScreenLayout/BottomBar/BottomPad/BottomContent"]
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.960784, 0.901961, 0.698039, 1)
+theme_override_font_sizes/font_size = 14
+text = "0.0 groschen / sec"
+vertical_alignment = 1
+
+[node name="ComboStreak" type="Label" parent="ScreenLayout/BottomBar/BottomPad/BottomContent"]
+theme_override_colors/font_color = Color(0.545098, 0.411765, 0.0784314, 1)
+theme_override_font_sizes/font_size = 14
+text = "Combo: ×1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CritCounter" type="Label" parent="ScreenLayout/BottomBar/BottomPad/BottomContent"]
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+theme_override_font_sizes/font_size = 14
+text = "Next crit: 15"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="JournalText" type="Label" parent="ScreenLayout/BottomBar/BottomPad/BottomContent"]
+visible = false
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.545098, 0.411765, 0.0784314, 1)
+theme_override_font_sizes/font_size = 13
+text = "Cold hammer. Cold room. Let's see what you're worth."
+horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="SeizureOverlay" type="CanvasLayer" parent="."]
 visible = false

@@ -18,8 +18,13 @@ const CRIT_ROTATION_AMOUNT: float = 0.05
 @onready var _coin_button: TextureButton = $ScreenLayout/MainContent/CoinPanel/CoinContainer/CoinButton
 @onready var _groschen_total: Label = $ScreenLayout/MainContent/CoinPanel/CoinContainer/GroschenTotal
 @onready var _floating_label_pool: Node = $ScreenLayout/MainContent/CoinPanel/CoinContainer/FloatingLabelPool
+@onready var _groschen_sec_detail: Label = $ScreenLayout/BottomBar/BottomPad/BottomContent/GroschenSecDetail
+@onready var _combo_streak: Label = $ScreenLayout/BottomBar/BottomPad/BottomContent/ComboStreak
+@onready var _crit_counter: Label = $ScreenLayout/BottomBar/BottomPad/BottomContent/CritCounter
+@onready var _journal_text: Label = $ScreenLayout/BottomBar/BottomPad/BottomContent/JournalText
 
 var _coin_feedback_tween: Tween
+var _journal_tween: Tween
 var _combo_active: bool = false
 var _coin_hovered: bool = false
 var _last_coin_click_time: float = -GameManager.COMBO_WINDOW_SEC
@@ -31,12 +36,16 @@ func _ready() -> void:
     _ensure_floating_label_pool()
     GameManager.groschen_updated.connect(_on_groschen_updated)
     GameManager.coin_clicked.connect(_on_coin_clicked)
+    GameManager.journal_entry.connect(_on_journal_entry)
     _coin_button.pressed.connect(GameManager.click_coin)
     _coin_button.mouse_entered.connect(_on_coin_mouse_entered)
     _coin_button.mouse_exited.connect(_on_coin_mouse_exited)
     _on_groschen_updated(GameManager.groschen, GameManager.groschen_per_sec)
     _groschen_total.text = "%s groschen" % _format_groschen_value(GameManager.groschen)
     _combo_label.visible = false
+    _combo_streak.text = "Combo: ×1"
+    _crit_counter.text = "Next crit: %d" % GameManager.get_clicks_until_next_crit()
+    _journal_text.visible = false
     _apply_coin_idle_modulate()
 
 
@@ -48,12 +57,14 @@ func _process(_delta: float) -> void:
     if current_time - _last_coin_click_time > GameManager.get_combo_window_seconds():
         _combo_active = false
         _combo_label.visible = false
+        _combo_streak.text = "Combo: ×1"
         _apply_coin_idle_modulate()
 
 
 func _on_groschen_updated(_total: float, per_sec: float) -> void:
     _groschen_rate_label.text = "%0.1f / sec" % per_sec
     _groschen_total.text = "%s groschen" % _format_groschen_value(GameManager.groschen)
+    _groschen_sec_detail.text = "%0.1f groschen / sec" % per_sec
 
 
 func _on_coin_clicked(amount: float, is_crit: bool, combo: int) -> void:
@@ -63,6 +74,8 @@ func _on_coin_clicked(amount: float, is_crit: bool, combo: int) -> void:
     if _combo_active:
         _combo_label.text = "×%d COMBO" % combo
 
+    _combo_streak.text = "Combo: ×%d" % combo
+    _crit_counter.text = "Next crit: %d" % GameManager.get_clicks_until_next_crit()
     _play_coin_feedback(is_crit)
     _apply_coin_idle_modulate()
     _show_floating_label(amount, is_crit)
@@ -158,6 +171,24 @@ func _show_floating_label(amount: float, is_crit: bool) -> void:
 func _on_floating_label_tween_finished(floating_label: Label) -> void:
     floating_label.visible = false
     floating_label.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
+
+
+func _on_journal_entry(text: String) -> void:
+    if _journal_tween != null:
+        _journal_tween.kill()
+
+    _journal_text.text = text
+    _journal_text.visible = true
+    _journal_text.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
+    _journal_tween = create_tween()
+    _journal_tween.tween_interval(5.0)
+    _journal_tween.tween_property(_journal_text, "self_modulate:a", 0.0, 1.0)
+    _journal_tween.finished.connect(_on_journal_fade_finished)
+
+
+func _on_journal_fade_finished() -> void:
+    _journal_text.visible = false
+    _journal_text.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
 
 
 func _format_groschen_value(amount: float) -> String:

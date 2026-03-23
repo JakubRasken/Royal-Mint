@@ -364,30 +364,9 @@ func _show_shift_report(results: Dictionary) -> void:
 
 func _update_header_day(day_num: int) -> void:
     if day_num <= 0:
-        _day_counter_label.text = "Day -"
+        _day_counter_label.text = "Day - / %d" % GameManager.FINAL_DAY
         return
-    _day_counter_label.text = "Day %s of XIV" % _to_roman(day_num)
-
-
-func _to_roman(number: int) -> String:
-    var remainder: int = maxi(number, 0)
-    var roman_text: String = ""
-    var numerals: Array[Array] = [
-        [10, "X"],
-        [9, "IX"],
-        [5, "V"],
-        [4, "IV"],
-        [1, "I"]
-    ]
-
-    for numeral_data: Array in numerals:
-        var numeral_value: int = int(numeral_data[0])
-        var numeral_text: String = String(numeral_data[1])
-        while remainder >= numeral_value:
-            roman_text += numeral_text
-            remainder -= numeral_value
-
-    return roman_text if not roman_text.is_empty() else "I"
+    _day_counter_label.text = "Day %d / %d" % [day_num, GameManager.FINAL_DAY]
 
 
 func _clear_incapacitated_assignments() -> void:

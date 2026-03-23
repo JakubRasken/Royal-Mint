@@ -66,7 +66,9 @@ func complete_shift(results: Dictionary) -> void:
     var total_output: int = int(results.get("total_output", 0))
     Ledger.set_daily_output(merchant_grade_output)
 
-    if merchant_grade_output <= 0:
+    # Treat the collapse check as literal zero coins produced.
+    # Low-quality output can fail the quota without meaning the mint stood still.
+    if total_output <= 0:
         _consecutive_zero_output_days += 1
     else:
         _consecutive_zero_output_days = 0

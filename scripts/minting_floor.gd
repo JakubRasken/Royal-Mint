@@ -347,12 +347,14 @@ func _finalize_shift_results(pending_results: Dictionary) -> void:
         return
 
     _apply_end_of_day_worker_updates()
+    GameManager.refresh_journal_entry()
     GameManager.evaluate_worker_collapse()
     if GameManager.current_phase == GameManager.GamePhase.COMPLETE:
         return
 
     _refresh_stage_previews()
     _worker_roster.refresh()
+    _show_shift_report(GameManager.get_last_shift_results())
 
 
 func _should_run_assay_inspection(pending_results: Dictionary) -> bool:
@@ -501,6 +503,7 @@ func _show_shift_report(results: Dictionary) -> void:
     var merchant_output: int = int(results.get("merchant_grade_or_better", 0))
     var quality_grade: String = String(results.get("quality_grade", "Debased"))
     var interruption_note: String = String(results.get("interruption_note", ""))
+    var journal_entry: String = String(results.get("journal_entry", ""))
     _shift_report_label.text = INTERRUPTION_OUTPUT_LABEL_FORMAT % [total_output, merchant_output]
     _grade_stamp.visible = true
     _grade_stamp_label.text = "%s grade" % quality_grade
@@ -508,6 +511,8 @@ func _show_shift_report(results: Dictionary) -> void:
     _shift_report_detail.text = _grade_flavour_comment(quality_grade)
     if not interruption_note.is_empty():
         _shift_report_detail.text += " " + interruption_note
+    if not journal_entry.is_empty():
+        _shift_report_detail.text += "\n\nJournal: \"%s\"" % journal_entry
 
 
 func _start_assay_inspection(pending_results: Dictionary) -> void:

@@ -12,6 +12,14 @@ const FINAL_DAY: int = 14
 const SHIFT_DURATION_SECONDS: int = 90
 const ZERO_OUTPUT_FAILURE_THRESHOLD: int = 3
 const SIGISMUND_ATTENTION_MAX: int = 5
+const JOURNAL_ENTRY_BY_CONDITION: Dictionary = {
+    "high_quality": "A good day's work. The groschen rang true against the stone.",
+    "jiri_fatigued": "Jiri could barely lift the hammer by dusk. I should let him rest tomorrow.",
+    "quota_missed": "The Crown's man will notice. I need to push harder.",
+    "debased_sent": "God forgive me. Those coins will buy bread for someone.",
+    "sigismund_complied": "I told myself it was just this once.",
+    "default": "The books close for now, but tomorrow will ask the same of me again."
+}
 const DAILY_FLAVOUR_BY_WORKER: Dictionary = {
     "Radek": {
         "idle": [
@@ -112,12 +120,12 @@ func complete_shift(results: Dictionary) -> void:
         return
 
     _last_shift_results = results.duplicate(true)
-    if String(results.get("quality_grade", "")) == "Debased":
+    if String(_last_shift_results.get("quality_grade", "")) == "Debased":
         _raise_sigismund_attention()
     current_phase = GamePhase.EVENING_REPORT
 
-    var merchant_grade_output: int = int(results.get("merchant_grade_or_better", 0))
-    var total_output: int = int(results.get("total_output", 0))
+    var merchant_grade_output: int = int(_last_shift_results.get("merchant_grade_or_better", 0))
+    var total_output: int = int(_last_shift_results.get("total_output", 0))
     Ledger.set_daily_output(merchant_grade_output)
 
     # Treat the collapse check as literal zero coins produced.
@@ -164,6 +172,12 @@ func resolve_active_event(choice_id: String) -> Dictionary:
 
 func get_last_shift_results() -> Dictionary:
     return _last_shift_results.duplicate(true)
+
+
+func refresh_journal_entry() -> void:
+    if _last_shift_results.is_empty():
+        return
+    _last_shift_results["journal_entry"] = _build_journal_entry(_last_shift_results)
 
 
 func get_sigismund_attention() -> int:
@@ -268,6 +282,30 @@ func _raise_sigismund_attention(amount: int = 1) -> void:
         return
     _sigismund_attention = next_attention
     sigismund_attention_changed.emit(_sigismund_attention)
+
+
+func _build_journal_entry(results: Dictionary) -> String:
+    var quality_grade: String = String(results.get("quality_grade", ""))
+    if resolved_event != null and resolved_event.event_id == "sigismund_bribe" and resolved_event_choice_id == "a":
+        return JOURNAL_ENTRY_BY_CONDITION["sigismund_complied"]
+    if quality_grade == "Debased":
+        return JOURNAL_ENTRY_BY_CONDITION["debased_sent"]
+    if not Ledger.did_meet_daily_quota():
+        return JOURNAL_ENTRY_BY_CONDITION["quota_missed"]
+
+    var jiri: Worker = _find_worker_by_name("Jiri")
+    if jiri != null and jiri.fatigue >= 80:
+        return JOURNAL_ENTRY_BY_CONDITION["jiri_fatigued"]
+    if quality_grade == "Royal":
+        return JOURNAL_ENTRY_BY_CONDITION["high_quality"]
+    return JOURNAL_ENTRY_BY_CONDITION["default"]
+
+
+func _find_worker_by_name(worker_name: String) -> Worker:
+    for worker: Worker in workers:
+        if worker.worker_name == worker_name:
+            return worker
+    return null
 
 
 func _describe_event_resolution(event_resource: GameEvent, choice_id: String, effects: Dictionary) -> String:

@@ -86,10 +86,17 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_progress_fill")
 value = 0.0
 show_percentage = false
 
-[node name="QuotaStatusLabel" type="Label" parent="VBoxContainer/QuotaSection"]
+[node name="QuotaStatusBanner" type="PanelContainer" parent="VBoxContainer/QuotaSection"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.164706, 0.352941, 0.164706, 1)
+clip_contents = false
+
+[node name="QuotaStatusLabel" type="Label" parent="VBoxContainer/QuotaSection/QuotaStatusBanner"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.992157, 0.964706, 0.890196, 1)
+theme_override_font_sizes/font_size = 14
 text = "Quota unmet"
+horizontal_alignment = 1
 
 [node name="StatsGrid" type="GridContainer" parent="VBoxContainer"]
 layout_mode = 2

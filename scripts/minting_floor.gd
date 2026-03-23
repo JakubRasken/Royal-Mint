@@ -36,6 +36,7 @@ const SHIFT_TIMER_BELL_GAIN: float = 0.18
 const SHIFT_TIMER_BELL_BUFFER_LENGTH: float = 0.3
 const SHIFT_TIMER_BELL_PULSE_MIN_ALPHA: float = 0.55
 const SHIFT_TIMER_BELL_PULSE_SPEED: float = 4.0
+const INTERRUPTION_OUTPUT_LABEL_FORMAT: String = "%d coins struck. %d counted toward quota."
 
 @onready var _stage_nodes: Dictionary = {
     "smelting": $"ScreenLayout/MainContent/LeftPanel/StageContainer/PipelineStage_Smelting",
@@ -57,6 +58,11 @@ const SHIFT_TIMER_BELL_PULSE_SPEED: float = 4.0
 @onready var _shift_timer_bar = $"ScreenLayout/MainContent/LeftPanel/ShiftTimerSection/ShiftTimerBar"
 @onready var _shift_timer_warning_label: Label = $"ScreenLayout/MainContent/LeftPanel/ShiftTimerSection/ShiftTimerWarningLabel"
 @onready var _shift_timer_audio_player: AudioStreamPlayer = $"ScreenLayout/MainContent/LeftPanel/ShiftTimerSection/ShiftTimerAudioPlayer"
+@onready var _interruption_overlay: Control = $InterruptionOverlay
+@onready var _interruption_title: Label = $"InterruptionOverlay/InterruptionPanel/InterruptionContent/InterruptionTitle"
+@onready var _interruption_narrative: Label = $"InterruptionOverlay/InterruptionPanel/InterruptionContent/InterruptionNarrative"
+@onready var _interruption_choice_a_button: Button = $"InterruptionOverlay/InterruptionPanel/InterruptionContent/InterruptionChoiceRow/InterruptionChoiceAButton"
+@onready var _interruption_choice_b_button: Button = $"InterruptionOverlay/InterruptionPanel/InterruptionContent/InterruptionChoiceRow/InterruptionChoiceBButton"
 
 var _pending_stage_id: String = ""
 var _day_counter_tween: Tween
@@ -65,6 +71,12 @@ var _shift_timer_running: bool = false
 var _shift_timer_warning_played: bool = false
 var _shift_timer_audio_playback: AudioStreamGeneratorPlayback
 var _shift_timer_elapsed: float = 0.0
+var _shift_output_multiplier: float = 1.0
+var _shift_flat_coin_loss: int = 0
+var _shift_quality_penalty: float = 0.0
+var _forced_floor_hands_stages: Dictionary = {}
+var _active_interruption_note: String = ""
+var _shift_interruption_active: bool = false
  
 
 func _ready() -> void:
@@ -75,10 +87,13 @@ func _ready() -> void:
     _morning_brief.begin_shift_requested.connect(_on_begin_shift_requested)
     _morning_brief.event_choice_selected.connect(_on_event_choice_selected)
     _day_advance_button.pressed.connect(_on_day_advance_pressed)
+    _interruption_choice_a_button.pressed.connect(_on_interruption_choice_pressed.bind("a"))
+    _interruption_choice_b_button.pressed.connect(_on_interruption_choice_pressed.bind("b"))
 
     GameManager.day_started.connect(_on_day_started)
     GameManager.day_ended.connect(_on_day_ended)
     GameManager.game_over.connect(_on_game_over)
+    EventManager.shift_interruption_triggered.connect(_on_shift_interruption_triggered)
 
     _worker_roster.set_workers(GameManager.workers)
     if GameManager.current_phase == GameManager.GamePhase.NOT_STARTED and GameManager.current_day == 0:
@@ -109,6 +124,7 @@ func _on_stage_worker_removed(stage_id: String) -> void:
     GameManager.stage_assignments.erase(stage_id)
     _clear_pending_stage_assignment(stage_id)
     _refresh_stage_previews()
+    _refresh_shift_interruption_candidates()
 
 
 func _on_worker_selected(worker: Worker) -> void:
@@ -129,6 +145,7 @@ func _on_worker_selected(worker: Worker) -> void:
     stage_node.assign_worker(worker)
     _pending_stage_id = ""
     _refresh_stage_previews()
+    _refresh_shift_interruption_candidates()
 
 
 func _on_worker_rest_toggled(worker: Worker) -> void:
@@ -142,10 +159,12 @@ func _on_worker_rest_toggled(worker: Worker) -> void:
 
     _refresh_stage_previews()
     _worker_roster.refresh()
+    _refresh_shift_interruption_candidates()
 
 
 func _on_stage_worker_state_changed(_stage_id: String, _worker: Worker) -> void:
     _worker_roster.refresh()
+    _refresh_shift_interruption_candidates()
 
 
 func _on_begin_shift_requested() -> void:
@@ -153,9 +172,11 @@ func _on_begin_shift_requested() -> void:
         return
 
     _pending_stage_id = ""
+    _reset_shift_modifiers()
     GameManager.begin_shift()
     _set_stage_shift_active(true)
     _start_shift_timer()
+    EventManager.begin_shift_interruptions(_build_shift_interruption_candidates())
     _morning_brief.hide_brief()
     _update_day_button_for_phase()
 
@@ -180,6 +201,8 @@ func _on_day_started(day_num: int) -> void:
     _pending_stage_id = ""
     _set_stage_shift_active(false)
     _stop_shift_timer()
+    EventManager.end_shift_interruptions()
+    _hide_shift_interruption()
     _clear_incapacitated_assignments()
     _update_header_day(day_num)
     _morning_brief.show_brief(day_num, GameManager.active_event)
@@ -187,6 +210,7 @@ func _on_day_started(day_num: int) -> void:
     _worker_roster.refresh()
     _show_waiting_shift_report()
     _update_day_button_for_phase()
+    _refresh_shift_interruption_candidates()
 
 
 func _on_day_ended(_results: Dictionary) -> void:
@@ -197,6 +221,8 @@ func _on_day_ended(_results: Dictionary) -> void:
 func _on_game_over(ending_id: String) -> void:
     _set_stage_shift_active(false)
     _stop_shift_timer()
+    EventManager.end_shift_interruptions()
+    _hide_shift_interruption()
     _shift_timer_section.visible = false
     _day_advance_button.visible = false
     _morning_brief.hide_brief()
@@ -206,6 +232,8 @@ func _on_game_over(ending_id: String) -> void:
 func _complete_current_shift() -> void:
     _stop_shift_timer()
     _set_stage_shift_active(false)
+    EventManager.end_shift_interruptions()
+    _hide_shift_interruption()
     _pending_stage_id = ""
     var stage_outputs: Array[int] = []
     var quality_scores: Array[float] = []
@@ -213,7 +241,8 @@ func _complete_current_shift() -> void:
 
     for stage_id: String in ROLE_BY_STAGE.keys():
         var worker: Worker = GameManager.stage_assignments.get(stage_id) as Worker
-        if worker == null:
+        var forced_floor_hands: bool = _forced_floor_hands_stages.get(stage_id, false)
+        if worker == null or forced_floor_hands:
             stage_outputs.append(FLOOR_HAND_OUTPUT)
             quality_scores.append(FLOOR_HAND_QUALITY)
             floor_hands_used += 1
@@ -230,12 +259,15 @@ func _complete_current_shift() -> void:
         stage_outputs.append(output)
         quality_scores.append(_calculate_worker_quality(worker))
 
-    var total_output: int = stage_outputs.min() if not stage_outputs.is_empty() else 0
+    var raw_total_output: int = stage_outputs.min() if not stage_outputs.is_empty() else 0
     var average_quality: float = 0.0
     if not quality_scores.is_empty():
         for score: float in quality_scores:
             average_quality += score
         average_quality /= quality_scores.size()
+
+    var total_output: int = maxi(int(round(float(raw_total_output) * _shift_output_multiplier)) - _shift_flat_coin_loss, 0)
+    average_quality = clampf(average_quality - _shift_quality_penalty, 0.0, 100.0)
 
     var quality_grade: String = _quality_grade_from_score(average_quality)
     var merchant_or_better: int = 0
@@ -252,7 +284,8 @@ func _complete_current_shift() -> void:
         "floor_hands_used": floor_hands_used,
         "income_earned": income_earned,
         "wages_paid": wages_paid,
-        "net_result": income_earned - wages_paid
+        "net_result": income_earned - wages_paid,
+        "interruption_note": _active_interruption_note
     })
 
     if GameManager.current_phase == GameManager.GamePhase.COMPLETE:
@@ -406,11 +439,14 @@ func _show_shift_report(results: Dictionary) -> void:
     var total_output: int = int(results.get("total_output", 0))
     var merchant_output: int = int(results.get("merchant_grade_or_better", 0))
     var quality_grade: String = String(results.get("quality_grade", "Debased"))
-    _shift_report_label.text = "%d coins struck. %d counted toward quota." % [total_output, merchant_output]
+    var interruption_note: String = String(results.get("interruption_note", ""))
+    _shift_report_label.text = INTERRUPTION_OUTPUT_LABEL_FORMAT % [total_output, merchant_output]
     _grade_stamp.visible = true
     _grade_stamp_label.text = "%s grade" % quality_grade
     _grade_stamp.add_theme_stylebox_override("panel", _build_shift_grade_stamp(quality_grade))
     _shift_report_detail.text = _grade_flavour_comment(quality_grade)
+    if not interruption_note.is_empty():
+        _shift_report_detail.text += " " + interruption_note
 
 
 func _update_header_day(day_num: int) -> void:
@@ -543,6 +579,8 @@ func _update_shift_timer(delta: float) -> void:
         return
     if _morning_brief.visible:
         return
+    if _shift_interruption_active:
+        return
 
     _shift_time_remaining = maxf(_shift_time_remaining - delta, 0.0)
     _shift_timer_elapsed += delta
@@ -601,3 +639,107 @@ func _play_shift_timer_bell() -> void:
         var envelope: float = 1.0 - float(frame_index) / float(maxi(total_frames, 1))
         var sample: float = sin(TAU * SHIFT_TIMER_BELL_FREQUENCY * float(frame_index) / 44100.0) * SHIFT_TIMER_BELL_GAIN * envelope
         _shift_timer_audio_playback.push_frame(Vector2(sample, sample))
+
+
+func _on_shift_interruption_triggered(interruption: Dictionary) -> void:
+    if GameManager.current_phase != GameManager.GamePhase.SHIFT:
+        return
+
+    _shift_interruption_active = true
+    _set_stage_shift_active(false)
+    EventManager.pause_shift_interruptions()
+    _interruption_title.text = String(interruption.get("title", "Interruption"))
+    _interruption_narrative.text = String(interruption.get("narrative", "The floor demands a decision."))
+    _interruption_choice_a_button.text = String(interruption.get("choice_a_label", "Choice A"))
+    _interruption_choice_b_button.text = String(interruption.get("choice_b_label", "Choice B"))
+    _interruption_overlay.visible = true
+
+
+func _on_interruption_choice_pressed(choice_id: String) -> void:
+    var effects: Dictionary = EventManager.resolve_shift_interruption(choice_id)
+    _apply_shift_interruption_effects(effects)
+    _hide_shift_interruption()
+    if GameManager.current_phase == GameManager.GamePhase.SHIFT:
+        _set_stage_shift_active(true)
+        EventManager.resume_shift_interruptions()
+        _worker_roster.refresh()
+        _refresh_stage_previews()
+        _refresh_shift_interruption_candidates()
+
+
+func _hide_shift_interruption() -> void:
+    _shift_interruption_active = false
+    _interruption_overlay.visible = false
+
+
+func _apply_shift_interruption_effects(effects: Dictionary) -> void:
+    if effects.has("output_multiplier"):
+        _shift_output_multiplier *= float(effects["output_multiplier"])
+
+    if effects.has("flat_coin_loss"):
+        var available_struck_coins: int = maxi(_current_struck_coin_count() - _shift_flat_coin_loss, 0)
+        _shift_flat_coin_loss += mini(int(effects["flat_coin_loss"]), available_struck_coins)
+
+    if effects.has("quality_penalty"):
+        _shift_quality_penalty += float(effects["quality_penalty"])
+
+    if effects.has("force_floor_hands_stage"):
+        _forced_floor_hands_stages[String(effects["force_floor_hands_stage"])] = true
+
+    if effects.has("interruption_note"):
+        _active_interruption_note = String(effects["interruption_note"])
+
+    if effects.has("worker_fatigue_delta"):
+        var fatigue_delta: Dictionary = effects["worker_fatigue_delta"] as Dictionary
+        for worker_name: Variant in fatigue_delta.keys():
+            var worker: Worker = _find_worker_by_name(String(worker_name))
+            if worker != null:
+                worker.fatigue = clampi(worker.fatigue + int(fatigue_delta[worker_name]), 0, Worker.MAX_FATIGUE)
+
+
+func _reset_shift_modifiers() -> void:
+    _shift_output_multiplier = 1.0
+    _shift_flat_coin_loss = 0
+    _shift_quality_penalty = 0.0
+    _forced_floor_hands_stages.clear()
+    _active_interruption_note = ""
+
+
+func _find_worker_by_name(worker_name: String) -> Worker:
+    for worker: Worker in GameManager.workers:
+        if worker.worker_name == worker_name:
+            return worker
+    return null
+
+
+func _refresh_shift_interruption_candidates() -> void:
+    EventManager.set_shift_interruption_candidates(_build_shift_interruption_candidates())
+
+
+func _build_shift_interruption_candidates() -> Array[String]:
+    var interruption_candidates: Array[String] = ["suspicious_visitor"]
+    var smelting_worker: Worker = GameManager.stage_assignments.get("smelting") as Worker
+    if smelting_worker != null and not smelting_worker.is_resting and not smelting_worker.is_incapacitated():
+        interruption_candidates.append("furnace_spike")
+        if smelting_worker.worker_name == "Radek":
+            interruption_candidates.append("worker_slowing")
+
+    var striking_worker: Worker = GameManager.stage_assignments.get("striking") as Worker
+    if (
+        striking_worker != null
+        and striking_worker.worker_name == "Jiri"
+        and not striking_worker.is_resting
+        and not striking_worker.is_incapacitated()
+        and _current_struck_coin_count() > 0
+    ):
+        interruption_candidates.append("jiri_drops_die")
+
+    return interruption_candidates
+
+
+func _current_struck_coin_count() -> int:
+    var striking_stage = _stage_nodes.get("striking")
+    if striking_stage == null:
+        return 0
+    var striking_results: Dictionary = striking_stage.get_shift_results()
+    return int(striking_results.get("coins_struck", 0))

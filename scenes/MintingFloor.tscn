@@ -354,3 +354,87 @@ text = "Advance to next day"
 visible = false
 
 [node name="AuditorScreen" parent="." instance=ExtResource("5_audit")]
+
+[node name="InterruptionOverlay" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="InterruptionDimmer" type="ColorRect" parent="InterruptionOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.164706, 0.101961, 0.00784314, 0.42)
+
+[node name="InterruptionPanel" type="PanelContainer" parent="InterruptionOverlay"]
+custom_minimum_size = Vector2(620, 220)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -310.0
+offset_top = -110.0
+offset_right = 310.0
+offset_bottom = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="InterruptionContent" type="VBoxContainer" parent="InterruptionOverlay/InterruptionPanel"]
+layout_mode = 2
+clip_contents = false
+theme_override_constants/separation = 8
+
+[node name="InterruptionTitle" type="Label" parent="InterruptionOverlay/InterruptionPanel/InterruptionContent"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_font_sizes/font_size = 20
+text = "Interruption"
+
+[node name="InterruptionSeparator" type="HSeparator" parent="InterruptionOverlay/InterruptionPanel/InterruptionContent"]
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxLine_separator")
+
+[node name="InterruptionNarrative" type="Label" parent="InterruptionOverlay/InterruptionPanel/InterruptionContent"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.133333, 0.133333, 0.133333, 1)
+theme_override_font_sizes/font_size = 15
+text = "A problem rises from the floor."
+autowrap_mode = 3
+
+[node name="InterruptionChoiceRow" type="HBoxContainer" parent="InterruptionOverlay/InterruptionPanel/InterruptionContent"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="InterruptionChoiceAButton" type="Button" parent="InterruptionOverlay/InterruptionPanel/InterruptionContent/InterruptionChoiceRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_colors/font_hover_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_colors/font_pressed_color = Color(0.992157, 0.964706, 0.890196, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+text = "Choice A"
+
+[node name="InterruptionChoiceBButton" type="Button" parent="InterruptionOverlay/InterruptionPanel/InterruptionContent/InterruptionChoiceRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_colors/font_hover_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_colors/font_pressed_color = Color(0.992157, 0.964706, 0.890196, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+text = "Choice B"

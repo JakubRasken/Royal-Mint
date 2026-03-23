@@ -13,6 +13,7 @@ const SHIFT_FATIGUE_GAIN: int = 20
 @export_range(0, 100) var loyalty: int = 50
 @export var portrait: Texture2D
 @export var is_resting: bool = false
+var daily_flavour: String = ""
 
 
 func apply_shift_fatigue() -> void:

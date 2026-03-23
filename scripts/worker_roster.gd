@@ -110,7 +110,7 @@ func _on_rest_button_pressed(worker_name: String) -> void:
 
 func _build_status_text(worker: Worker) -> String:
     if worker.is_incapacitated():
-        return "Collapsed after the last shift"
+        return _append_daily_flavour("Collapsed after the last shift", worker)
 
     if worker.is_resting:
         return "Resting today"
@@ -118,18 +118,18 @@ func _build_status_text(worker: Worker) -> String:
     if _assignments_by_worker_name.has(worker.worker_name):
         var assignment_text: String = "Assigned to %s" % String(_assignments_by_worker_name[worker.worker_name])
         if worker.loyalty <= 40:
-            return assignment_text + ", but openly discontented"
-        return assignment_text
+            return _append_daily_flavour(assignment_text + ", but openly discontented", worker)
+        return _append_daily_flavour(assignment_text, worker)
 
     if not _pending_role.is_empty() and worker.role == _pending_role:
         if worker.loyalty <= 40:
-            return "Ready for assignment, but resentful"
-        return "Ready for assignment"
+            return _append_daily_flavour("Ready for assignment, but resentful", worker)
+        return _append_daily_flavour("Ready for assignment", worker)
 
     if worker.loyalty <= 40:
-        return "Idle and muttering about the pay"
+        return _append_daily_flavour("Idle and muttering about the pay", worker)
 
-    return "Waiting in the roster"
+    return _append_daily_flavour("Waiting in the roster", worker)
 
 
 func _row_modulate_for_worker(worker: Worker) -> Color:
@@ -166,3 +166,11 @@ func _stripe_color_for_worker(worker: Worker) -> Color:
     if _assignments_by_worker_name.has(worker.worker_name):
         return STRIPE_ASSIGNED_COLOR
     return STRIPE_IDLE_COLOR
+
+
+func _append_daily_flavour(base_status: String, worker: Worker) -> String:
+    if worker.daily_flavour.is_empty():
+        return base_status
+    if base_status.ends_with("."):
+        return "%s %s" % [base_status, worker.daily_flavour]
+    return "%s. %s" % [base_status, worker.daily_flavour]

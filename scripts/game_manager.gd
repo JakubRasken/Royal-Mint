@@ -9,6 +9,50 @@ signal game_over(ending_id: String)
 const FIRST_DAY: int = 1
 const FINAL_DAY: int = 14
 const ZERO_OUTPUT_FAILURE_THRESHOLD: int = 3
+const DAILY_FLAVOUR_BY_WORKER: Dictionary = {
+    "Radek": {
+        "idle": [
+            "Sharpening tools. Waiting.",
+            "Arms crossed. Ready."
+        ],
+        "fatigued": [
+            "Hands shaking. Needs rest.",
+            "Soot in his lungs. Still glaring at the furnace."
+        ],
+        "rested": [
+            "Back straight. Ready to work.",
+            "Fresh from rest. The furnace has his attention."
+        ]
+    },
+    "Bozena": {
+        "idle": [
+            "Eyeing the ledger suspiciously.",
+            "Polishing the assay scales."
+        ],
+        "fatigued": [
+            "Eyes bloodshot. Barely standing.",
+            "Squinting at the silver. Her patience is spent."
+        ],
+        "rested": [
+            "Back straight. Ready to work.",
+            "Quill trimmed. Scales steady again."
+        ]
+    },
+    "Jiri": {
+        "idle": [
+            "Idle and muttering about the pay.",
+            "Picking at the die. Restless."
+        ],
+        "fatigued": [
+            "Hands shaking. Needs rest.",
+            "Eyes bloodshot. Barely standing."
+        ],
+        "rested": [
+            "Back straight. Ready to work.",
+            "Rested, but still watching the purse."
+        ]
+    }
+}
 
 enum GamePhase {
     NOT_STARTED,
@@ -30,9 +74,11 @@ var resolved_event_choice_id: String = ""
 var resolved_event_summary: String = ""
 var _consecutive_zero_output_days: int = 0
 var _last_shift_results: Dictionary = {}
+var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 
 func start_new_game() -> void:
+    _rng.randomize()
     current_day = FIRST_DAY - 1
     current_phase = GamePhase.NOT_STARTED
     active_event = null
@@ -130,6 +176,7 @@ func _start_day(day_num: int) -> void:
     resolved_event_summary = ""
     Ledger.start_day(current_day)
     active_event = EventManager.trigger_day_event(current_day)
+    _assign_daily_flavour()
     day_started.emit(current_day)
 
 
@@ -166,6 +213,31 @@ func _load_workers() -> void:
         var worker: Worker = load(worker_path) as Worker
         if worker != null:
             workers.append(worker.duplicate(true) as Worker)
+
+
+func _assign_daily_flavour() -> void:
+    for worker: Worker in workers:
+        worker.daily_flavour = _pick_daily_flavour(worker)
+
+
+func _pick_daily_flavour(worker: Worker) -> String:
+    var flavour_sets: Dictionary = DAILY_FLAVOUR_BY_WORKER.get(worker.worker_name, {}) as Dictionary
+    if flavour_sets.is_empty():
+        return ""
+
+    var flavour_key: String = "idle"
+    if worker.fatigue >= 80:
+        flavour_key = "fatigued"
+    elif current_day > FIRST_DAY and worker.fatigue == 0:
+        flavour_key = "rested"
+
+    var flavour_options: Array = flavour_sets.get(flavour_key, [])
+    if flavour_options.is_empty():
+        flavour_options = flavour_sets.get("idle", [])
+    if flavour_options.is_empty():
+        return ""
+
+    return String(flavour_options[_rng.randi_range(0, flavour_options.size() - 1)])
 
 
 func _describe_event_resolution(event_resource: GameEvent, choice_id: String, effects: Dictionary) -> String:

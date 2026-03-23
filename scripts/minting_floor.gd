@@ -2,6 +2,7 @@
 # signals without pushing any game logic into the scene tree.
 extends Control
 
+const UpgradeRowScript: GDScript = preload("res://scripts/upgrade_row.gd")
 const COIN_HOVER_MODULATE: Color = Color(1.15, 1.15, 1.0, 1.0)
 const COIN_COMBO_MODULATE: Color = Color(1.2, 1.1, 0.8, 1.0)
 const COIN_CRIT_FLASH_MODULATE: Color = Color(1.5, 1.4, 0.8, 1.0)
@@ -22,6 +23,7 @@ const CRIT_ROTATION_AMOUNT: float = 0.05
 @onready var _combo_streak: Label = $ScreenLayout/BottomBar/BottomPad/BottomContent/ComboStreak
 @onready var _crit_counter: Label = $ScreenLayout/BottomBar/BottomPad/BottomContent/CritCounter
 @onready var _journal_text: Label = $ScreenLayout/BottomBar/BottomPad/BottomContent/JournalText
+@onready var _upgrade_list: VBoxContainer = $ScreenLayout/MainContent/RightPanel/RightPanelPad/UpgradeList
 
 var _coin_feedback_tween: Tween
 var _journal_tween: Tween
@@ -29,6 +31,10 @@ var _combo_active: bool = false
 var _coin_hovered: bool = false
 var _last_coin_click_time: float = -GameManager.COMBO_WINDOW_SEC
 var _floating_label_rng: RandomNumberGenerator = RandomNumberGenerator.new()
+var _upgrade_rows: Array[UpgradeRow] = []
+var _tier1_header: Label
+var _workers_header: Label
+var _tier3_header: Label
 
 
 func _ready() -> void:
@@ -37,9 +43,11 @@ func _ready() -> void:
     GameManager.groschen_updated.connect(_on_groschen_updated)
     GameManager.coin_clicked.connect(_on_coin_clicked)
     GameManager.journal_entry.connect(_on_journal_entry)
+    GameManager.upgrade_purchased.connect(_on_upgrade_purchased)
     _coin_button.pressed.connect(GameManager.click_coin)
     _coin_button.mouse_entered.connect(_on_coin_mouse_entered)
     _coin_button.mouse_exited.connect(_on_coin_mouse_exited)
+    _populate_shop()
     _on_groschen_updated(GameManager.groschen, GameManager.groschen_per_sec)
     _groschen_total.text = "%s groschen" % _format_groschen_value(GameManager.groschen)
     _combo_label.visible = false
@@ -65,6 +73,7 @@ func _on_groschen_updated(_total: float, per_sec: float) -> void:
     _groschen_rate_label.text = "%0.1f / sec" % per_sec
     _groschen_total.text = "%s groschen" % _format_groschen_value(GameManager.groschen)
     _groschen_sec_detail.text = "%0.1f groschen / sec" % per_sec
+    _refresh_upgrade_rows()
 
 
 func _on_coin_clicked(amount: float, is_crit: bool, combo: int) -> void:
@@ -189,6 +198,73 @@ func _on_journal_entry(text: String) -> void:
 func _on_journal_fade_finished() -> void:
     _journal_text.visible = false
     _journal_text.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
+
+
+# Builds the right-panel shop from authored upgrade data so costs, tiers, and
+# purchase state stay driven by resources instead of hand-authored row nodes.
+func _populate_shop() -> void:
+    _upgrade_rows.clear()
+    _tier1_header = null
+    _workers_header = null
+    _tier3_header = null
+
+    for child: Node in _upgrade_list.get_children():
+        child.free()
+
+    _tier1_header = _make_shop_header("Tier1Header", "── Tier 1 ──")
+    _upgrade_list.add_child(_tier1_header)
+
+    var added_workers_header: bool = false
+    var added_tier3_header: bool = false
+    for upgrade: UpgradeData in UpgradeManager.all_upgrades:
+        if upgrade == null:
+            continue
+        if not GameManager.is_upgrade_unlocked(upgrade) and not UpgradeManager.purchased_ids.has(upgrade.upgrade_id):
+            continue
+
+        if upgrade.tier >= 2 and not added_workers_header:
+            _workers_header = _make_shop_header("WorkersHeader", "── Workers ──")
+            _workers_header.visible = GameManager.total_groschen_spent >= GameManager.TIER2_UNLOCK_SPEND
+            _upgrade_list.add_child(_workers_header)
+            added_workers_header = true
+        if upgrade.tier >= 3 and not added_tier3_header:
+            _tier3_header = _make_shop_header("Tier3Header", "── Tier 3 ──")
+            _tier3_header.visible = GameManager.total_groschen_spent >= GameManager.TIER3_UNLOCK_SPEND
+            _upgrade_list.add_child(_tier3_header)
+            added_tier3_header = true
+
+        var upgrade_row: UpgradeRow = UpgradeRowScript.new()
+        upgrade_row.name = "UpgradeRow_%s" % upgrade.upgrade_id
+        _upgrade_list.add_child(upgrade_row)
+        upgrade_row.setup(upgrade)
+        _upgrade_rows.append(upgrade_row)
+
+    _refresh_upgrade_rows()
+
+
+func _refresh_upgrade_rows() -> void:
+    if _workers_header != null:
+        _workers_header.visible = GameManager.total_groschen_spent >= GameManager.TIER2_UNLOCK_SPEND
+    if _tier3_header != null:
+        _tier3_header.visible = GameManager.total_groschen_spent >= GameManager.TIER3_UNLOCK_SPEND
+
+    for upgrade_row: UpgradeRow in _upgrade_rows:
+        if is_instance_valid(upgrade_row):
+            upgrade_row.refresh_state()
+
+
+func _make_shop_header(node_name: String, text_value: String) -> Label:
+    var header: Label = Label.new()
+    header.name = node_name
+    header.text = text_value
+    header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    header.add_theme_color_override("font_color", Color("8b6914"))
+    header.add_theme_font_size_override("font_size", 13)
+    return header
+
+
+func _on_upgrade_purchased(_upgrade_id: String) -> void:
+    _populate_shop()
 
 
 func _format_groschen_value(amount: float) -> String:

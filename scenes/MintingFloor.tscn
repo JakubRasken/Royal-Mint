@@ -184,9 +184,18 @@ size_flags_vertical = 3
 horizontal_scroll_mode = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_right_panel")
 
-[node name="UpgradeList" type="VBoxContainer" parent="ScreenLayout/MainContent/RightPanel"]
+[node name="RightPanelPad" type="MarginContainer" parent="ScreenLayout/MainContent/RightPanel"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="UpgradeList" type="VBoxContainer" parent="ScreenLayout/MainContent/RightPanel/RightPanelPad"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
 
 [node name="BottomBar" type="PanelContainer" parent="ScreenLayout"]
 custom_minimum_size = Vector2(0, 40)

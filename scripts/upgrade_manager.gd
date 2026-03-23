@@ -22,7 +22,12 @@ func get_available_upgrades() -> Array[UpgradeData]:
 
 
 func is_affordable(upgrade: UpgradeData) -> bool:
-    return upgrade != null and not purchased_ids.has(upgrade.upgrade_id) and GameManager.groschen >= float(upgrade.cost)
+    return (
+        upgrade != null
+        and not purchased_ids.has(upgrade.upgrade_id)
+        and GameManager.is_upgrade_unlocked(upgrade)
+        and GameManager.groschen >= GameManager.get_upgrade_cost(upgrade)
+    )
 
 
 func purchase_upgrade(upgrade_id: String) -> void:

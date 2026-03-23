@@ -313,6 +313,14 @@ func get_clicks_until_next_crit() -> int:
     return _crit_interval if clicks_remaining == 0 else clicks_remaining
 
 
+func get_upgrade_cost(upgrade: UpgradeData) -> float:
+    return _get_upgrade_cost(upgrade)
+
+
+func is_upgrade_unlocked(upgrade: UpgradeData) -> bool:
+    return _is_upgrade_unlocked(upgrade)
+
+
 func _add_earned_groschen(amount: float) -> void:
     if amount <= 0.0:
         return

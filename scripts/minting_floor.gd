@@ -21,6 +21,9 @@ const DAY_COUNTER_WARNING_COLOR: Color = Color("c17f24")
 const DAY_COUNTER_DANGER_COLOR: Color = Color("8b1a1a")
 const DAY_COUNTER_PULSE_MIN_ALPHA: float = 0.6
 const DAY_COUNTER_PULSE_DURATION: float = 0.6
+const SIGISMUND_SEAL_BASE_ALPHA: float = 0.2
+const SIGISMUND_SEAL_MAX_ALPHA: float = 1.0
+const SIGISMUND_SEAL_COLOR: Color = Color("8b1a1a")
 const SHIFT_GRADE_TEXT_COLOR: Color = Color("fdf6e3")
 const SHIFT_GRADE_BORDER_COLOR: Color = Color("5c4409")
 const SHIFT_GRADE_ROYAL_COLOR: Color = Color("8b6914")
@@ -38,6 +41,7 @@ const SHIFT_GRADE_DEBASED_COLOR: Color = Color("8b1a1a")
 @onready var _auditor_screen = $AuditorScreen
 @onready var _day_advance_button: Button = $"ScreenLayout/BottomSection/EndShiftButton"
 @onready var _day_counter_label: Label = $ScreenLayout/HeaderBar/HeaderContent/DayCounterLabel
+@onready var _sigismund_seal: TextureRect = $ScreenLayout/HeaderBar/HeaderContent/SigismundSeal
 @onready var _shift_report_panel: PanelContainer = $"ScreenLayout/BottomSection/ShiftReport"
 @onready var _shift_report_label: Label = $"ScreenLayout/BottomSection/ShiftReport/ReportContent/ShiftReportLabel"
 @onready var _grade_stamp: PanelContainer = $"ScreenLayout/BottomSection/ShiftReport/ReportContent/GradeStamp"
@@ -362,6 +366,8 @@ func _show_shift_report(results: Dictionary) -> void:
 
 
 func _update_header_day(day_num: int) -> void:
+    _update_sigismund_seal(day_num)
+
     if _day_counter_tween != null:
         _day_counter_tween.kill()
         _day_counter_tween = null
@@ -388,6 +394,25 @@ func _update_header_day(day_num: int) -> void:
         return
 
     _day_counter_label.add_theme_color_override("font_color", DAY_COUNTER_SAFE_COLOR)
+
+
+func _update_sigismund_seal(day_num: int) -> void:
+    if day_num < 2:
+        _sigismund_seal.visible = false
+        return
+
+    var seal_alpha: float = lerpf(
+        SIGISMUND_SEAL_BASE_ALPHA,
+        SIGISMUND_SEAL_MAX_ALPHA,
+        clampf(float(day_num - 2) / float(GameManager.FINAL_DAY - 2), 0.0, 1.0)
+    )
+    _sigismund_seal.visible = true
+    _sigismund_seal.modulate = Color(
+        SIGISMUND_SEAL_COLOR.r,
+        SIGISMUND_SEAL_COLOR.g,
+        SIGISMUND_SEAL_COLOR.b,
+        seal_alpha
+    )
 
 
 func _build_shift_grade_stamp(quality_grade: String) -> StyleBoxFlat:

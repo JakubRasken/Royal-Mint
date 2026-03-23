@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://g6xarrsdlss3"]
+[gd_scene load_steps=20 format=3 uid="uid://g6xarrsdlss3"]
 
 [ext_resource type="PackedScene" path="res://scenes/PipelineStageSlot.tscn" id="1_stage"]
 [ext_resource type="PackedScene" path="res://scenes/LedgerPanel.tscn" id="2_ledger"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://scripts/minting_floor.gd" id="6_floor"]
 [ext_resource type="Texture2D" path="res://assets/ui/logo_coin_gold.svg" id="7_logo"]
 [ext_resource type="Texture2D" path="res://assets/ui/background_mint_floor.png" id="8_background"]
+[ext_resource type="Texture2D" path="res://assets/sprites/icon_stat_loyalty.png" id="9_seal"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
 bg_color = Color(0.960784, 0.901961, 0.698039, 1)
@@ -189,6 +190,16 @@ theme_override_font_sizes/font_size = 22
 text = "Day 1 / 14"
 horizontal_alignment = 2
 vertical_alignment = 1
+
+[node name="SigismundSeal" type="TextureRect" parent="ScreenLayout/HeaderBar/HeaderContent"]
+visible = false
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+mouse_filter = 2
+modulate = Color(0.545098, 0.101961, 0.101961, 0.2)
+texture = ExtResource("9_seal")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="MainContent" type="HBoxContainer" parent="ScreenLayout"]
 layout_mode = 2

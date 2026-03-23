@@ -28,6 +28,8 @@ func show_brief(day_num: int, active_event: GameEvent) -> void:
             "Day %d begins beneath soot and parchment. Keep the furnaces hot, "
             + "the dies true, and the ledger clean before the Crown looks closer."
         ) % day_num
+        if day_num == 1:
+            _narrative_label.text += " A courier passed through last night bearing Sigismund's colours. No message. Just watching."
         _choice_row.visible = false
         _begin_shift_button.disabled = false
         return

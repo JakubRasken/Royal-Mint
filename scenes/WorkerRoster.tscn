@@ -1,6 +1,9 @@
-[gd_scene load_steps=11 format=3 uid="uid://cbp2lu5dg61b3"]
+[gd_scene load_steps=14 format=3 uid="uid://cbp2lu5dg61b3"]
 
 [ext_resource type="Script" path="res://scripts/worker_roster.gd" id="1_u4oqn"]
+[ext_resource type="Texture2D" path="res://assets/sprites/icon_stat_skill.png" id="2_skill"]
+[ext_resource type="Texture2D" path="res://assets/sprites/icon_stat_fatigue.png" id="3_fatigue"]
+[ext_resource type="Texture2D" path="res://assets/sprites/icon_stat_loyalty.png" id="4_loyalty"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.992157, 0.964706, 0.890196, 1)
@@ -129,15 +132,37 @@ text = "Waiting in the roster"
 layout_mode = 2
 theme_override_constants/separation = 10
 
+[node name="SkillIcon" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Radek/InfoColumn/StatsRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(18, 18)
+texture = ExtResource("2_skill")
+expand_mode = 1
+stretch_mode = 5
+
 [node name="SkillLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Radek/InfoColumn/StatsRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
 text = "Skill 4"
 
+[node name="FatigueIcon" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Radek/InfoColumn/StatsRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(18, 18)
+texture = ExtResource("3_fatigue")
+expand_mode = 1
+stretch_mode = 5
+
 [node name="FatigueLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Radek/InfoColumn/StatsRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
 text = "Fatigue 0"
+
+[node name="LoyaltyIcon" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Radek/InfoColumn/StatsRow"]
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(18, 18)
+texture = ExtResource("4_loyalty")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="LoyaltyLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Radek/InfoColumn/StatsRow"]
 visible = false
@@ -188,15 +213,37 @@ text = "Waiting in the roster"
 layout_mode = 2
 theme_override_constants/separation = 10
 
+[node name="SkillIcon" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Bozena/InfoColumn/StatsRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(18, 18)
+texture = ExtResource("2_skill")
+expand_mode = 1
+stretch_mode = 5
+
 [node name="SkillLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Bozena/InfoColumn/StatsRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
 text = "Skill 3"
 
+[node name="FatigueIcon" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Bozena/InfoColumn/StatsRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(18, 18)
+texture = ExtResource("3_fatigue")
+expand_mode = 1
+stretch_mode = 5
+
 [node name="FatigueLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Bozena/InfoColumn/StatsRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
 text = "Fatigue 0"
+
+[node name="LoyaltyIcon" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Bozena/InfoColumn/StatsRow"]
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(18, 18)
+texture = ExtResource("4_loyalty")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="LoyaltyLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Bozena/InfoColumn/StatsRow"]
 visible = false
@@ -247,15 +294,37 @@ text = "Waiting in the roster"
 layout_mode = 2
 theme_override_constants/separation = 10
 
+[node name="SkillIcon" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Jiri/InfoColumn/StatsRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(18, 18)
+texture = ExtResource("2_skill")
+expand_mode = 1
+stretch_mode = 5
+
 [node name="SkillLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Jiri/InfoColumn/StatsRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
 text = "Skill 2"
 
+[node name="FatigueIcon" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Jiri/InfoColumn/StatsRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(18, 18)
+texture = ExtResource("3_fatigue")
+expand_mode = 1
+stretch_mode = 5
+
 [node name="FatigueLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Jiri/InfoColumn/StatsRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
 text = "Fatigue 0"
+
+[node name="LoyaltyIcon" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Jiri/InfoColumn/StatsRow"]
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(18, 18)
+texture = ExtResource("4_loyalty")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="LoyaltyLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Jiri/InfoColumn/StatsRow"]
 visible = false

@@ -5,6 +5,7 @@ extends PanelContainer
 signal worker_selected(worker: Worker)
 signal rest_toggled(worker: Worker)
 
+const EMPTY_PORTRAIT_TEXTURE: Texture2D = preload("res://assets/sprites/portrait_empty_slot.png")
 const ROLE_BY_WORKER: Dictionary = {
     "Radek": "Smelter",
     "Bozena": "Assayer",
@@ -63,6 +64,7 @@ func refresh() -> void:
             continue
 
         var row: HBoxContainer = _worker_rows[worker_name] as HBoxContainer
+        var portrait_rect: TextureRect = row.get_node("Portrait") as TextureRect
         var info_column: VBoxContainer = row.get_node("InfoColumn") as VBoxContainer
         var stats_row: HBoxContainer = info_column.get_node("StatsRow") as HBoxContainer
         var name_label: Label = info_column.get_node("NameLabel") as Label
@@ -71,6 +73,7 @@ func refresh() -> void:
         var fatigue_label: Label = stats_row.get_node("FatigueLabel") as Label
         var rest_button: Button = row.get_node("RestDayButton") as Button
 
+        portrait_rect.texture = worker.portrait if worker.portrait != null else EMPTY_PORTRAIT_TEXTURE
         name_label.text = "%s - %s" % [worker.worker_name, worker.role]
         status_label.text = _build_status_text(worker)
         skill_label.text = "Skill %d" % worker.skill

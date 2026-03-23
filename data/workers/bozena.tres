@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="Worker" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="Worker" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/worker.gd" id="1_7y8ek"]
+[ext_resource type="Texture2D" path="res://assets/sprites/portrait_bozena.png" id="2_yl5qr"]
 
 [resource]
 script = ExtResource("1_7y8ek")
@@ -9,4 +10,5 @@ role = "Assayer"
 skill = 3
 fatigue = 0
 loyalty = 80
+portrait = ExtResource("2_yl5qr")
 is_resting = false

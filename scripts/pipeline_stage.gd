@@ -6,6 +6,12 @@ signal assignment_requested(stage_id: String)
 signal worker_assigned(stage_id: String, worker: Worker)
 signal worker_removed(stage_id: String)
 
+const EMPTY_PORTRAIT_TEXTURE: Texture2D = preload("res://assets/sprites/portrait_empty_slot.png")
+const STAGE_ICON_BY_ID: Dictionary = {
+    "smelting": preload("res://assets/sprites/icon_stage_smelting.png"),
+    "striking": preload("res://assets/sprites/icon_stage_striking.png"),
+    "assay": preload("res://assets/sprites/icon_stage_assay.png")
+}
 const EMPTY_WORKER_NAME: String = "Unassigned"
 const EMPTY_OUTPUT_TEXT: String = "~0 coins / shift"
 const REMOVE_BUTTON_TEXT: String = "Remove"
@@ -22,8 +28,10 @@ const FATIGUE_HIGH_COLOR: Color = Color(0.5451, 0.1020, 0.1020, 1.0)
 @export var stage_name: String = "Smelting"
 
 @onready var _stage_name_label: Label = %StageNameLabel
+@onready var _worker_portrait: TextureRect = %WorkerPortrait
 @onready var _worker_name_label: Label = %WorkerName
 @onready var _assign_button: Button = %AssignButton
+@onready var _output_icon: TextureRect = %OutputIcon
 @onready var _output_label: Label = %OutputLabel
 @onready var _fatigue_segments: Array[ColorRect] = [
     %FatigueSegment1,
@@ -86,8 +94,10 @@ func get_assigned_worker() -> Worker:
 
 func _refresh_display() -> void:
     _stage_name_label.text = stage_name
+    _output_icon.texture = STAGE_ICON_BY_ID.get(stage_id) as Texture2D
 
     if _assigned_worker == null:
+        _worker_portrait.texture = EMPTY_PORTRAIT_TEXTURE
         _worker_name_label.text = EMPTY_WORKER_NAME
         _assign_button.text = PICK_WORKER_TEXT if _assignment_pending else ASSIGN_BUTTON_TEXT
         _assign_button.disabled = false
@@ -101,6 +111,7 @@ func _refresh_display() -> void:
         self_modulate = ACTIVE_STAGE_MODULATE if _assignment_pending else Color(1, 1, 1, 1)
         return
 
+    _worker_portrait.texture = _assigned_worker.portrait if _assigned_worker.portrait != null else EMPTY_PORTRAIT_TEXTURE
     _worker_name_label.text = _assigned_worker.worker_name
     _assign_button.text = REMOVE_BUTTON_TEXT
     _assign_button.disabled = false

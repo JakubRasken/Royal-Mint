@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="Worker" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="Worker" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/worker.gd" id="1_qldxg"]
+[ext_resource type="Texture2D" path="res://assets/sprites/portrait_radek.png" id="2_qf3m4"]
 
 [resource]
 script = ExtResource("1_qldxg")
@@ -9,4 +10,5 @@ role = "Smelter"
 skill = 4
 fatigue = 0
 loyalty = 95
+portrait = ExtResource("2_qf3m4")
 is_resting = false

@@ -278,6 +278,10 @@ func get_combo_multiplier() -> float:
     return float(_combo_count)
 
 
+func get_combo_window_seconds() -> float:
+    return _combo_window_sec
+
+
 func _add_earned_groschen(amount: float) -> void:
     if amount <= 0.0:
         return

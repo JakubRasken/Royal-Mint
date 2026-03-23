@@ -1,7 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://g6xarrsdlss3"]
+[gd_scene load_steps=9 format=3 uid="uid://g6xarrsdlss3"]
 
 [ext_resource type="Script" path="res://scripts/minting_floor.gd" id="1_floor"]
 [ext_resource type="Script" path="res://scripts/sigismund_bar.gd" id="2_sigismund_bar"]
+[ext_resource type="Texture2D" path="res://assets/ui/royal_mint_logo_gold.png" id="3_coin"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_header_bar"]
 bg_color = Color(0.360784, 0.266667, 0.0352941, 1)
@@ -153,6 +154,28 @@ mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_coin_panel")
 
 [node name="CoinContainer" type="VBoxContainer" parent="ScreenLayout/MainContent/CoinPanel"]
+theme_override_constants/separation = 12
+
+[node name="ComboLabel" type="Label" parent="ScreenLayout/MainContent/CoinPanel/CoinContainer"]
+visible = false
+theme_override_colors/font_color = Color(0.545098, 0.411765, 0.0784314, 1)
+theme_override_font_sizes/font_size = 28
+text = "×2 COMBO"
+horizontal_alignment = 1
+
+[node name="CoinButton" type="TextureButton" parent="ScreenLayout/MainContent/CoinPanel/CoinContainer"]
+custom_minimum_size = Vector2(256, 256)
+texture_normal = ExtResource("3_coin")
+ignore_texture_size = false
+stretch_mode = 4
+
+[node name="GroschenTotal" type="Label" parent="ScreenLayout/MainContent/CoinPanel/CoinContainer"]
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_font_sizes/font_size = 42
+text = "0 groschen"
+horizontal_alignment = 1
+
+[node name="FloatingLabelPool" type="Node" parent="ScreenLayout/MainContent/CoinPanel/CoinContainer"]
 
 [node name="RightPanel" type="ScrollContainer" parent="ScreenLayout/MainContent"]
 custom_minimum_size = Vector2(280, 0)

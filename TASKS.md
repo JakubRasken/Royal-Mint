@@ -24,7 +24,7 @@ _(Codex: move a task here when you start it)_
 
 ## Done
 
-- [x] 2026-03-23 UI: add mintmaster journal entry per evening (`commit: pending current ui commit`)
+- [x] 2026-03-23 UI: add mintmaster journal entry per evening (`commit: 1593297`)
 - [x] 2026-03-23 UI: add Sigismund threat tracker to header (`commit: fead30b`)
 - [x] 2026-03-23 Gameplay: add manual coin inspection at assay (`commit: 97c4ab8`)
 - [x] 2026-03-23 Gameplay: add mid-shift random interruptions (`commit: 183e88a`)

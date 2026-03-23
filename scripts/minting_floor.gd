@@ -18,19 +18,19 @@ const QUALITY_SKILL_WEIGHT: float = 15.0
 const QUALITY_FATIGUE_PENALTY: float = 0.15
 
 @onready var _stage_nodes: Dictionary = {
-    "smelting": $"HBoxContainer/LeftPanel/StageContainer/PipelineStage_Smelting",
-    "striking": $"HBoxContainer/LeftPanel/StageContainer/PipelineStage_Striking",
-    "assay": $"HBoxContainer/LeftPanel/StageContainer/PipelineStage_Assay"
+    "smelting": $"ScreenLayout/MainContent/LeftPanel/StageContainer/PipelineStage_Smelting",
+    "striking": $"ScreenLayout/MainContent/LeftPanel/StageContainer/PipelineStage_Striking",
+    "assay": $"ScreenLayout/MainContent/LeftPanel/StageContainer/PipelineStage_Assay"
 }
-@onready var _worker_roster = $"HBoxContainer/RightPanel/WorkerRoster"
+@onready var _worker_roster = $"ScreenLayout/MainContent/RightPanel/WorkerRoster"
 @onready var _morning_brief = $MorningBrief
 @onready var _auditor_screen = $AuditorScreen
 @onready var _day_advance_button: Button = $DayAdvanceButton
-@onready var _day_counter_label: Label = $HeaderBar/HeaderContent/DayCounterLabel
-@onready var _shift_report_panel: PanelContainer = $"HBoxContainer/LeftPanel/ShiftReportPanel"
-@onready var _shift_report_title: Label = $"HBoxContainer/LeftPanel/ShiftReportPanel/VBoxContainer/ShiftReportTitle"
-@onready var _shift_report_summary: Label = $"HBoxContainer/LeftPanel/ShiftReportPanel/VBoxContainer/ShiftReportSummary"
-@onready var _shift_report_detail: Label = $"HBoxContainer/LeftPanel/ShiftReportPanel/VBoxContainer/ShiftReportDetail"
+@onready var _day_counter_label: Label = $ScreenLayout/HeaderBar/HeaderContent/DayCounterLabel
+@onready var _shift_report_panel: PanelContainer = $"ScreenLayout/MainContent/LeftPanel/ShiftReportPanel"
+@onready var _shift_report_title: Label = $"ScreenLayout/MainContent/LeftPanel/ShiftReportPanel/VBoxContainer/ShiftReportTitle"
+@onready var _shift_report_summary: Label = $"ScreenLayout/MainContent/LeftPanel/ShiftReportPanel/VBoxContainer/ShiftReportSummary"
+@onready var _shift_report_detail: Label = $"ScreenLayout/MainContent/LeftPanel/ShiftReportPanel/VBoxContainer/ShiftReportDetail"
 
 var _pending_stage_id: String = ""
  

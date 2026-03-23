@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/upgrade_data.gd" id="1_upgrade"]
+
+[resource]
+script = ExtResource("1_upgrade")
+upgrade_id = "upgrade_better_die"
+label = "Better Die"
+description = "+1 groschen per click."
+cost = 10
+tier = 1
+effect_type = "click_add"
+effect_value = 1.0
+is_one_time = true

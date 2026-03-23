@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Worker" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/worker.gd" id="1_worker"]
+[ext_resource type="Texture2D" path="res://assets/sprites/portrait_radek.png" id="2_portrait"]
+
+[resource]
+script = ExtResource("1_worker")
+worker_name = "Radek"
+role = "Smelter"
+cost = 200
+groschen_per_sec = 0.0
+portrait = ExtResource("2_portrait")
+hire_journal = "Radek came in smelling of soot and old grudges. Good. The furnace respects that."
+is_hired = false
+has_goof = false
+has_rest = false
+has_skim = false

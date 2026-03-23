@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/upgrade_data.gd" id="1_upgrade"]
+
+[resource]
+script = ExtResource("1_upgrade")
+upgrade_id = "upgrade_heavier_hammer"
+label = "Heavier Hammer"
+description = "Click value x1.5."
+cost = 25
+tier = 1
+effect_type = "click_mul"
+effect_value = 1.5
+is_one_time = true

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Worker" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/worker.gd" id="1_worker"]
+[ext_resource type="Texture2D" path="res://assets/sprites/portrait_jiri.png" id="2_portrait"]
+
+[resource]
+script = ExtResource("1_worker")
+worker_name = "Jiri"
+role = "Pressman"
+cost = 80
+groschen_per_sec = 1.0
+portrait = ExtResource("2_portrait")
+hire_journal = "Jiri arrived this morning. Young, restless, cheap. He'll do."
+is_hired = false
+has_goof = true
+has_rest = false
+has_skim = false

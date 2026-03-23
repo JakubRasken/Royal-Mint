@@ -438,3 +438,217 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
 text = "Choice B"
+
+[node name="AssayOverlay" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="AssayDimmer" type="ColorRect" parent="AssayOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.164706, 0.101961, 0.00784314, 0.42)
+
+[node name="AssayPanel" type="PanelContainer" parent="AssayOverlay"]
+custom_minimum_size = Vector2(700, 260)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -130.0
+offset_right = 350.0
+offset_bottom = 130.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="AssayContent" type="VBoxContainer" parent="AssayOverlay/AssayPanel"]
+layout_mode = 2
+clip_contents = false
+theme_override_constants/separation = 8
+
+[node name="AssayTitle" type="Label" parent="AssayOverlay/AssayPanel/AssayContent"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_font_sizes/font_size = 20
+text = "Assay inspection"
+
+[node name="AssaySeparator" type="HSeparator" parent="AssayOverlay/AssayPanel/AssayContent"]
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxLine_separator")
+
+[node name="AssayInstructionLabel" type="Label" parent="AssayOverlay/AssayPanel/AssayContent"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.133333, 0.133333, 0.133333, 1)
+theme_override_font_sizes/font_size = 15
+text = "Click any coins you want rejected before the clerk seals the batch."
+autowrap_mode = 3
+
+[node name="AssayTimerLabel" type="Label" parent="AssayOverlay/AssayPanel/AssayContent"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.545098, 0.411765, 0.0784314, 1)
+theme_override_font_sizes/font_size = 14
+text = "Inspection window: 8s"
+horizontal_alignment = 1
+
+[node name="AssayCoinRow" type="HBoxContainer" parent="AssayOverlay/AssayPanel/AssayContent"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="CoinSlot1" type="MarginContainer" parent="AssayOverlay/AssayPanel/AssayContent/AssayCoinRow"]
+layout_mode = 2
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="CoinButton1" type="TextureButton" parent="AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot1"]
+layout_mode = 2
+custom_minimum_size = Vector2(72, 72)
+texture_normal = ExtResource("7_logo")
+stretch_mode = 5
+
+[node name="RejectMark1" type="Label" parent="AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot1/CoinButton1"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -14.0
+offset_top = -18.0
+offset_right = 14.0
+offset_bottom = 18.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.545098, 0.101961, 0.101961, 1)
+theme_override_font_sizes/font_size = 30
+text = "X"
+horizontal_alignment = 1
+
+[node name="CoinSlot2" type="MarginContainer" parent="AssayOverlay/AssayPanel/AssayContent/AssayCoinRow"]
+layout_mode = 2
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="CoinButton2" type="TextureButton" parent="AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot2"]
+layout_mode = 2
+custom_minimum_size = Vector2(72, 72)
+texture_normal = ExtResource("7_logo")
+stretch_mode = 5
+
+[node name="RejectMark2" type="Label" parent="AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot2/CoinButton2"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -14.0
+offset_top = -18.0
+offset_right = 14.0
+offset_bottom = 18.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.545098, 0.101961, 0.101961, 1)
+theme_override_font_sizes/font_size = 30
+text = "X"
+horizontal_alignment = 1
+
+[node name="CoinSlot3" type="MarginContainer" parent="AssayOverlay/AssayPanel/AssayContent/AssayCoinRow"]
+layout_mode = 2
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="CoinButton3" type="TextureButton" parent="AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot3"]
+layout_mode = 2
+custom_minimum_size = Vector2(72, 72)
+texture_normal = ExtResource("7_logo")
+stretch_mode = 5
+
+[node name="RejectMark3" type="Label" parent="AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot3/CoinButton3"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -14.0
+offset_top = -18.0
+offset_right = 14.0
+offset_bottom = 18.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.545098, 0.101961, 0.101961, 1)
+theme_override_font_sizes/font_size = 30
+text = "X"
+horizontal_alignment = 1
+
+[node name="CoinSlot4" type="MarginContainer" parent="AssayOverlay/AssayPanel/AssayContent/AssayCoinRow"]
+layout_mode = 2
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="CoinButton4" type="TextureButton" parent="AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot4"]
+layout_mode = 2
+custom_minimum_size = Vector2(72, 72)
+texture_normal = ExtResource("7_logo")
+stretch_mode = 5
+
+[node name="RejectMark4" type="Label" parent="AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot4/CoinButton4"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -14.0
+offset_top = -18.0
+offset_right = 14.0
+offset_bottom = 18.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.545098, 0.101961, 0.101961, 1)
+theme_override_font_sizes/font_size = 30
+text = "X"
+horizontal_alignment = 1
+
+[node name="CoinSlot5" type="MarginContainer" parent="AssayOverlay/AssayPanel/AssayContent/AssayCoinRow"]
+layout_mode = 2
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="CoinButton5" type="TextureButton" parent="AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot5"]
+layout_mode = 2
+custom_minimum_size = Vector2(72, 72)
+texture_normal = ExtResource("7_logo")
+stretch_mode = 5
+
+[node name="RejectMark5" type="Label" parent="AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot5/CoinButton5"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -14.0
+offset_top = -18.0
+offset_right = 14.0
+offset_bottom = 18.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.545098, 0.101961, 0.101961, 1)
+theme_override_font_sizes/font_size = 30
+text = "X"
+horizontal_alignment = 1

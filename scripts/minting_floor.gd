@@ -37,6 +37,14 @@ const SHIFT_TIMER_BELL_BUFFER_LENGTH: float = 0.3
 const SHIFT_TIMER_BELL_PULSE_MIN_ALPHA: float = 0.55
 const SHIFT_TIMER_BELL_PULSE_SPEED: float = 4.0
 const INTERRUPTION_OUTPUT_LABEL_FORMAT: String = "%d coins struck. %d counted toward quota."
+const ASSAY_INSPECTION_DURATION: float = 8.0
+const ASSAY_SAMPLE_COUNT: int = 5
+const ASSAY_ROYAL_SCORE: float = 92.0
+const ASSAY_MERCHANT_SCORE: float = 74.0
+const ASSAY_COMMON_SCORE: float = 54.0
+const ASSAY_DEBASED_SCORE: float = 18.0
+const ASSAY_HINT_COLOR: Color = Color(0.5451, 0.1019, 0.1019, 0.45)
+const ASSAY_NORMAL_COLOR: Color = Color(1, 1, 1, 1)
 
 @onready var _stage_nodes: Dictionary = {
     "smelting": $"ScreenLayout/MainContent/LeftPanel/StageContainer/PipelineStage_Smelting",
@@ -63,6 +71,22 @@ const INTERRUPTION_OUTPUT_LABEL_FORMAT: String = "%d coins struck. %d counted to
 @onready var _interruption_narrative: Label = $"InterruptionOverlay/InterruptionPanel/InterruptionContent/InterruptionNarrative"
 @onready var _interruption_choice_a_button: Button = $"InterruptionOverlay/InterruptionPanel/InterruptionContent/InterruptionChoiceRow/InterruptionChoiceAButton"
 @onready var _interruption_choice_b_button: Button = $"InterruptionOverlay/InterruptionPanel/InterruptionContent/InterruptionChoiceRow/InterruptionChoiceBButton"
+@onready var _assay_overlay: Control = $AssayOverlay
+@onready var _assay_timer_label: Label = $"AssayOverlay/AssayPanel/AssayContent/AssayTimerLabel"
+@onready var _assay_coin_buttons: Array[TextureButton] = [
+    $"AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot1/CoinButton1",
+    $"AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot2/CoinButton2",
+    $"AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot3/CoinButton3",
+    $"AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot4/CoinButton4",
+    $"AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot5/CoinButton5"
+]
+@onready var _assay_reject_marks: Array[Label] = [
+    $"AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot1/CoinButton1/RejectMark1",
+    $"AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot2/CoinButton2/RejectMark2",
+    $"AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot3/CoinButton3/RejectMark3",
+    $"AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot4/CoinButton4/RejectMark4",
+    $"AssayOverlay/AssayPanel/AssayContent/AssayCoinRow/CoinSlot5/CoinButton5/RejectMark5"
+]
 
 var _pending_stage_id: String = ""
 var _day_counter_tween: Tween
@@ -77,6 +101,11 @@ var _shift_quality_penalty: float = 0.0
 var _forced_floor_hands_stages: Dictionary = {}
 var _active_interruption_note: String = ""
 var _shift_interruption_active: bool = false
+var _assay_inspection_active: bool = false
+var _assay_time_remaining: float = 0.0
+var _assay_samples: Array[Dictionary] = []
+var _pending_shift_results: Dictionary = {}
+var _assay_rng: RandomNumberGenerator = RandomNumberGenerator.new()
  
 
 func _ready() -> void:
@@ -89,6 +118,8 @@ func _ready() -> void:
     _day_advance_button.pressed.connect(_on_day_advance_pressed)
     _interruption_choice_a_button.pressed.connect(_on_interruption_choice_pressed.bind("a"))
     _interruption_choice_b_button.pressed.connect(_on_interruption_choice_pressed.bind("b"))
+    for coin_index: int in _assay_coin_buttons.size():
+        _assay_coin_buttons[coin_index].pressed.connect(_on_assay_coin_pressed.bind(coin_index))
 
     GameManager.day_started.connect(_on_day_started)
     GameManager.day_ended.connect(_on_day_ended)
@@ -105,6 +136,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
     _update_shift_timer(delta)
+    _update_assay_inspection(delta)
 
 
 func _connect_stage_signals() -> void:
@@ -203,6 +235,7 @@ func _on_day_started(day_num: int) -> void:
     _stop_shift_timer()
     EventManager.end_shift_interruptions()
     _hide_shift_interruption()
+    _hide_assay_inspection()
     _clear_incapacitated_assignments()
     _update_header_day(day_num)
     _morning_brief.show_brief(day_num, GameManager.active_event)
@@ -223,6 +256,7 @@ func _on_game_over(ending_id: String) -> void:
     _stop_shift_timer()
     EventManager.end_shift_interruptions()
     _hide_shift_interruption()
+    _hide_assay_inspection()
     _shift_timer_section.visible = false
     _day_advance_button.visible = false
     _morning_brief.hide_brief()
@@ -235,6 +269,14 @@ func _complete_current_shift() -> void:
     EventManager.end_shift_interruptions()
     _hide_shift_interruption()
     _pending_stage_id = ""
+    var pending_results: Dictionary = _build_pending_shift_results()
+    if _should_run_assay_inspection(pending_results):
+        _start_assay_inspection(pending_results)
+        return
+    _finalize_shift_results(pending_results)
+
+
+func _build_pending_shift_results() -> Dictionary:
     var stage_outputs: Array[int] = []
     var quality_scores: Array[float] = []
     var floor_hands_used: int = 0
@@ -269,6 +311,17 @@ func _complete_current_shift() -> void:
     var total_output: int = maxi(int(round(float(raw_total_output) * _shift_output_multiplier)) - _shift_flat_coin_loss, 0)
     average_quality = clampf(average_quality - _shift_quality_penalty, 0.0, 100.0)
 
+    return {
+        "total_output": total_output,
+        "average_quality": average_quality,
+        "floor_hands_used": floor_hands_used
+    }
+
+ 
+func _finalize_shift_results(pending_results: Dictionary) -> void:
+    var total_output: int = int(pending_results.get("total_output", 0))
+    var average_quality: float = float(pending_results.get("average_quality", 0.0))
+    var floor_hands_used: int = int(pending_results.get("floor_hands_used", 0))
     var quality_grade: String = _quality_grade_from_score(average_quality)
     var merchant_or_better: int = 0
     if average_quality >= 65.0:
@@ -302,6 +355,16 @@ func _complete_current_shift() -> void:
 
     _refresh_stage_previews()
     _worker_roster.refresh()
+
+
+func _should_run_assay_inspection(pending_results: Dictionary) -> bool:
+    # Only open the assay pass when there is an actual batch to inspect.
+    var assay_worker: Worker = GameManager.stage_assignments.get("assay") as Worker
+    return (
+        assay_worker != null
+        and not assay_worker.is_incapacitated()
+        and int(pending_results.get("total_output", 0)) > 0
+    )
 
 
 func _apply_end_of_day_worker_updates() -> void:
@@ -447,6 +510,105 @@ func _show_shift_report(results: Dictionary) -> void:
     _shift_report_detail.text = _grade_flavour_comment(quality_grade)
     if not interruption_note.is_empty():
         _shift_report_detail.text += " " + interruption_note
+
+
+func _start_assay_inspection(pending_results: Dictionary) -> void:
+    _pending_shift_results = pending_results.duplicate(true)
+    _assay_samples = _generate_assay_samples(float(pending_results.get("average_quality", 0.0)))
+    _assay_time_remaining = ASSAY_INSPECTION_DURATION
+    _assay_inspection_active = true
+    _assay_overlay.visible = true
+    _assay_rng.randomize()
+    _refresh_assay_samples()
+
+
+func _update_assay_inspection(delta: float) -> void:
+    if not _assay_inspection_active:
+        return
+
+    _assay_time_remaining = maxf(_assay_time_remaining - delta, 0.0)
+    _assay_timer_label.text = "Inspection window: %0.1fs" % _assay_time_remaining
+    if _assay_time_remaining <= 0.0:
+        _resolve_assay_inspection()
+
+
+func _on_assay_coin_pressed(coin_index: int) -> void:
+    if not _assay_inspection_active:
+        return
+    if coin_index < 0 or coin_index >= _assay_samples.size():
+        return
+
+    var sample: Dictionary = _assay_samples[coin_index]
+    sample["rejected"] = not bool(sample.get("rejected", false))
+    _assay_samples[coin_index] = sample
+    _refresh_assay_samples()
+
+
+func _refresh_assay_samples() -> void:
+    var assay_worker: Worker = GameManager.stage_assignments.get("assay") as Worker
+    var show_bad_hints: bool = assay_worker != null and assay_worker.skill >= 3
+    for coin_index: int in _assay_coin_buttons.size():
+        var button: TextureButton = _assay_coin_buttons[coin_index]
+        var reject_mark: Label = _assay_reject_marks[coin_index]
+        var sample: Dictionary = _assay_samples[coin_index] if coin_index < _assay_samples.size() else {}
+        var sample_grade: String = String(sample.get("grade", "Merchant"))
+        var rejected: bool = bool(sample.get("rejected", false))
+        var show_hint: bool = show_bad_hints and sample_grade == "Debased"
+        button.modulate = ASSAY_HINT_COLOR if show_hint else ASSAY_NORMAL_COLOR
+        reject_mark.visible = rejected
+
+
+func _resolve_assay_inspection() -> void:
+    var accepted_samples: Array[Dictionary] = []
+    for sample: Dictionary in _assay_samples:
+        if not bool(sample.get("rejected", false)):
+            accepted_samples.append(sample)
+
+    var accepted_ratio: float = float(accepted_samples.size()) / float(maxi(ASSAY_SAMPLE_COUNT, 1))
+    var adjusted_results: Dictionary = _pending_shift_results.duplicate(true)
+    adjusted_results["total_output"] = int(floor(float(int(_pending_shift_results.get("total_output", 0))) * accepted_ratio))
+
+    var accepted_quality_total: float = 0.0
+    for sample: Dictionary in accepted_samples:
+        accepted_quality_total += float(sample.get("score", 0.0))
+    adjusted_results["average_quality"] = 0.0 if accepted_samples.is_empty() else accepted_quality_total / float(accepted_samples.size())
+
+    _hide_assay_inspection()
+    _finalize_shift_results(adjusted_results)
+
+
+func _hide_assay_inspection() -> void:
+    _assay_inspection_active = false
+    _assay_overlay.visible = false
+    _assay_time_remaining = 0.0
+    _assay_samples.clear()
+    _pending_shift_results.clear()
+
+
+func _generate_assay_samples(average_quality: float) -> Array[Dictionary]:
+    _assay_rng.randomize()
+    var samples: Array[Dictionary] = []
+    for _sample_index: int in ASSAY_SAMPLE_COUNT:
+        var sample_score: float = clampf(average_quality + _assay_rng.randf_range(-28.0, 24.0), 0.0, 100.0)
+        var sample_grade: String = _quality_grade_from_score(sample_score)
+        samples.append({
+            "score": _score_for_grade(sample_grade),
+            "grade": sample_grade,
+            "rejected": false
+        })
+    return samples
+
+
+func _score_for_grade(quality_grade: String) -> float:
+    match quality_grade:
+        "Royal":
+            return ASSAY_ROYAL_SCORE
+        "Merchant":
+            return ASSAY_MERCHANT_SCORE
+        "Common":
+            return ASSAY_COMMON_SCORE
+        _:
+            return ASSAY_DEBASED_SCORE
 
 
 func _update_header_day(day_num: int) -> void:

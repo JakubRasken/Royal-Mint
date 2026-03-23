@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://g6xarrsdlss3"]
+[gd_scene load_steps=13 format=3 uid="uid://g6xarrsdlss3"]
 
 [ext_resource type="Script" path="res://scripts/minting_floor.gd" id="1_floor"]
 [ext_resource type="Script" path="res://scripts/sigismund_bar.gd" id="2_sigismund_bar"]
@@ -26,6 +26,44 @@ border_color = Color(0.545098, 0.411765, 0.0784314, 1)
 bg_color = Color(0.164706, 0.101961, 0.00784314, 1)
 border_width_top = 2
 border_color = Color(0.545098, 0.411765, 0.0784314, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_seizure_panel"]
+bg_color = Color(0.992157, 0.964706, 0.890196, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.360784, 0.266667, 0.0352941, 1)
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_seizure_separator"]
+color = Color(0.545098, 0.411765, 0.0784314, 1)
+thickness = 2
+grow_begin = 1.0
+grow_end = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_restart_button"]
+bg_color = Color(0.360784, 0.266667, 0.0352941, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.545098, 0.411765, 0.0784314, 1)
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_restart_button_hover"]
+bg_color = Color(0.415686, 0.305882, 0.0588235, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.545098, 0.411765, 0.0784314, 1)
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
 
 [node name="MintingFloor" type="Control"]
 anchors_preset = 15
@@ -258,6 +296,7 @@ offset_bottom = 0.0
 color = Color(0.545098, 0.101961, 0.101961, 0.7)
 
 [node name="SeizurePanel" type="PanelContainer" parent="SeizureOverlay"]
+custom_minimum_size = Vector2(480, 0)
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -269,8 +308,49 @@ offset_right = 240.0
 offset_bottom = 120.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_seizure_panel")
 
-[node name="SeizureContent" type="VBoxContainer" parent="SeizureOverlay/SeizurePanel"]
+[node name="SeizurePad" type="MarginContainer" parent="SeizureOverlay/SeizurePanel"]
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="SeizureContent" type="VBoxContainer" parent="SeizureOverlay/SeizurePanel/SeizurePad"]
+theme_override_constants/separation = 16
+
+[node name="SeizureTitle" type="Label" parent="SeizureOverlay/SeizurePanel/SeizurePad/SeizureContent"]
+theme_override_colors/font_color = Color(0.360784, 0.266667, 0.0352941, 1)
+theme_override_font_sizes/font_size = 28
+text = "The mint is seized."
+horizontal_alignment = 1
+
+[node name="FlavourText" type="Label" parent="SeizureOverlay/SeizurePanel/SeizurePad/SeizureContent"]
+theme_override_colors/font_color = Color(0.333333, 0.333333, 0.333333, 1)
+theme_override_font_sizes/font_size = 16
+text = "Sigismund's men have taken the gates. You leave with nothing but your reputation."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Separator" type="HSeparator" parent="SeizureOverlay/SeizurePanel/SeizurePad/SeizureContent"]
+theme_override_styles/separator = SubResource("StyleBoxLine_seizure_separator")
+
+[node name="LegacyLabel" type="Label" parent="SeizureOverlay/SeizurePanel/SeizurePad/SeizureContent"]
+theme_override_colors/font_color = Color(0.545098, 0.411765, 0.0784314, 1)
+theme_override_font_sizes/font_size = 22
+text = "Legacy Bonus: ×1.00"
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="SeizureOverlay/SeizurePanel/SeizurePad/SeizureContent"]
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.960784, 0.901961, 0.698039, 1)
+theme_override_colors/font_hover_color = Color(0.960784, 0.901961, 0.698039, 1)
+theme_override_colors/font_pressed_color = Color(0.960784, 0.901961, 0.698039, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_restart_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_restart_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_restart_button")
+theme_override_styles/focus = SubResource("StyleBoxFlat_restart_button")
+text = "Strike again."
 
 [node name="AssayOverlay" type="CanvasLayer" parent="."]
 visible = false

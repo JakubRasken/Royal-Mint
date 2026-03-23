@@ -24,9 +24,14 @@ const CRIT_ROTATION_AMOUNT: float = 0.05
 @onready var _crit_counter: Label = $ScreenLayout/BottomBar/BottomPad/BottomContent/CritCounter
 @onready var _journal_text: Label = $ScreenLayout/BottomBar/BottomPad/BottomContent/JournalText
 @onready var _upgrade_list: VBoxContainer = $ScreenLayout/MainContent/RightPanel/RightPanelPad/UpgradeList
+@onready var _seizure_overlay: CanvasLayer = $SeizureOverlay
+@onready var _seizure_dimmer: ColorRect = $SeizureOverlay/SeizureDimmer
+@onready var _legacy_label: Label = $SeizureOverlay/SeizurePanel/SeizurePad/SeizureContent/LegacyLabel
+@onready var _restart_button: Button = $SeizureOverlay/SeizurePanel/SeizurePad/SeizureContent/RestartButton
 
 var _coin_feedback_tween: Tween
 var _journal_tween: Tween
+var _seizure_tween: Tween
 var _combo_active: bool = false
 var _coin_hovered: bool = false
 var _last_coin_click_time: float = -GameManager.COMBO_WINDOW_SEC
@@ -44,9 +49,11 @@ func _ready() -> void:
     GameManager.coin_clicked.connect(_on_coin_clicked)
     GameManager.journal_entry.connect(_on_journal_entry)
     GameManager.upgrade_purchased.connect(_on_upgrade_purchased)
+    GameManager.seizure_fired.connect(_on_seizure_fired)
     _coin_button.pressed.connect(GameManager.click_coin)
     _coin_button.mouse_entered.connect(_on_coin_mouse_entered)
     _coin_button.mouse_exited.connect(_on_coin_mouse_exited)
+    _restart_button.pressed.connect(_on_restart_button_pressed)
     _populate_shop()
     _on_groschen_updated(GameManager.groschen, GameManager.groschen_per_sec)
     _groschen_total.text = "%s groschen" % _format_groschen_value(GameManager.groschen)
@@ -54,6 +61,8 @@ func _ready() -> void:
     _combo_streak.text = "Combo: ×1"
     _crit_counter.text = "Next crit: %d" % GameManager.get_clicks_until_next_crit()
     _journal_text.visible = false
+    _seizure_overlay.visible = false
+    _seizure_dimmer.color = Color(0.545098, 0.101961, 0.101961, 0.0)
     _apply_coin_idle_modulate()
 
 
@@ -265,6 +274,27 @@ func _make_shop_header(node_name: String, text_value: String) -> Label:
 
 func _on_upgrade_purchased(_upgrade_id: String) -> void:
     _populate_shop()
+
+
+ # Drives the seizure overlay from GameManager's signal so the reset stays in
+ # the autoload and the scene only handles presentation and dismissal.
+func _on_seizure_fired(legacy_bonus: float) -> void:
+    if _seizure_tween != null:
+        _seizure_tween.kill()
+
+    _legacy_label.text = "Legacy Bonus: ×%.2f" % legacy_bonus
+    _seizure_overlay.visible = true
+    _seizure_dimmer.color = Color(0.545098, 0.101961, 0.101961, 0.0)
+    _seizure_tween = create_tween()
+    _seizure_tween.tween_property(_seizure_dimmer, "color:a", 0.7, 0.5)
+
+
+func _on_restart_button_pressed() -> void:
+    # QUESTION: The UI prompt says this button should call GameManager.fire_seizure(),
+    # but seizure_fired already fires after the reset. Calling it again here would
+    # double-apply prestige with zero earnings, so this only dismisses the overlay.
+    _seizure_overlay.visible = false
+    _seizure_dimmer.color = Color(0.545098, 0.101961, 0.101961, 0.0)
 
 
 func _format_groschen_value(amount: float) -> String:

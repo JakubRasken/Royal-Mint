@@ -24,6 +24,14 @@ _(Codex: move a task here when you start it)_
 
 ## Done
 
+- [x] 2026-03-23 UI Polish: force root control to true full-rect viewport fill (`commit: f657b72`)
+- [x] 2026-03-23 UI Polish: prevent shift report from being obscured by end shift button (`commit: e0e5076`)
+- [x] 2026-03-23 UI Polish: add animated day urgency to header (`commit: f08000b`)
+- [x] 2026-03-23 UI Polish: add flavour status lines to worker roster (`commit: 09c266d`)
+- [x] 2026-03-23 Gameplay: add coin grade feedback after each shift (`commit: 923f16b`)
+- [x] 2026-03-23 Gameplay: surface the Sigismund threat earlier (`commit: 7667d1f`)
+- [x] 2026-03-23 Gameplay: make the quota bar actually hurt when failing (`commit: df8252f`)
+- [x] 2026-03-23 UI Polish: add candlelight vignette to background (`commit: c074142`)
 - [x] 2026-03-23 UI Polish: restore header to top of layout flow (`commit: 4fef615`)
 - [x] 2026-03-23 UI Polish: correct fatigue bar fill direction (`commit: 79dbb68`)
 - [x] 2026-03-23 UI Polish: push roster watermark behind worker rows (`commit: 5a7c193`)

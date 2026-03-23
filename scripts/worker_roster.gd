@@ -16,6 +16,9 @@ const RESTING_ROW_MODULATE: Color = Color(0.75, 0.75, 0.75, 1.0)
 const HIGHLIGHT_ROW_MODULATE: Color = Color(1.0, 0.9686, 0.8431, 1.0)
 const DIMMED_ROW_MODULATE: Color = Color(0.88, 0.88, 0.88, 1.0)
 const INCAPACITATED_ROW_MODULATE: Color = Color(0.92, 0.84, 0.84, 1.0)
+const STRIPE_ASSIGNED_COLOR: Color = Color("8b6914")
+const STRIPE_IDLE_COLOR: Color = Color("555555")
+const STRIPE_FATIGUED_COLOR: Color = Color("8b1a1a")
 
 @onready var _worker_rows: Dictionary = {
     "Radek": $"VBoxContainer/WorkerList/WorkerRow_Radek",
@@ -64,6 +67,7 @@ func refresh() -> void:
             continue
 
         var row: HBoxContainer = _worker_rows[worker_name] as HBoxContainer
+        var status_stripe: ColorRect = row.get_node("StatusStripe") as ColorRect
         var portrait_rect: TextureRect = row.get_node("Portrait") as TextureRect
         var info_column: VBoxContainer = row.get_node("InfoColumn") as VBoxContainer
         var stats_row: HBoxContainer = info_column.get_node("StatsRow") as HBoxContainer
@@ -80,6 +84,7 @@ func refresh() -> void:
         fatigue_label.text = "Fatigue %d" % worker.fatigue
         rest_button.text = "Cancel rest" if worker.is_resting else "Rest today"
         row.modulate = _row_modulate_for_worker(worker)
+        status_stripe.color = _stripe_color_for_worker(worker)
 
 
 func _on_worker_row_gui_input(event: InputEvent, worker_name: String) -> void:
@@ -153,3 +158,11 @@ func _stage_label_from_id(stage_id: String) -> String:
             return "Assay"
         _:
             return stage_id.capitalize()
+
+
+func _stripe_color_for_worker(worker: Worker) -> Color:
+    if worker.fatigue > 80 or worker.is_incapacitated():
+        return STRIPE_FATIGUED_COLOR
+    if _assignments_by_worker_name.has(worker.worker_name):
+        return STRIPE_ASSIGNED_COLOR
+    return STRIPE_IDLE_COLOR

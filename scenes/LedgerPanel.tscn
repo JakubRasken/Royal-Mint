@@ -46,11 +46,13 @@ offset_right = 0.0
 offset_bottom = 210.0
 grow_horizontal = 2
 size_flags_horizontal = 3
+clip_contents = false
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 script = ExtResource("1_fr7np")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
+clip_contents = false
 theme_override_constants/separation = 8
 
 [node name="LedgerTitle" type="Label" parent="VBoxContainer"]
@@ -65,6 +67,7 @@ theme_override_styles/separator = SubResource("StyleBoxLine_separator")
 
 [node name="QuotaSection" type="VBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
+clip_contents = false
 theme_override_constants/separation = 4
 
 [node name="QuotaLabel" type="Label" parent="VBoxContainer/QuotaSection"]

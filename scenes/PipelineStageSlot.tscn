@@ -104,11 +104,13 @@ offset_right = 0.0
 offset_bottom = 180.0
 grow_horizontal = 2
 size_flags_horizontal = 3
+clip_contents = false
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 script = ExtResource("1_aa4qg")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
+clip_contents = false
 theme_override_constants/separation = 8
 
 [node name="StageNameLabel" type="Label" parent="VBoxContainer"]
@@ -120,6 +122,7 @@ text = "Smelting"
 
 [node name="WorkerSlot" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
+clip_contents = false
 theme_override_constants/separation = 8
 
 [node name="WorkerPortrait" type="TextureRect" parent="VBoxContainer/WorkerSlot"]
@@ -161,6 +164,7 @@ theme_override_styles/separator = SubResource("StyleBoxLine_separator")
 
 [node name="OutputPreview" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
+clip_contents = false
 theme_override_constants/separation = 8
 
 [node name="OutputIcon" type="TextureRect" parent="VBoxContainer/OutputPreview"]
@@ -182,6 +186,7 @@ text = "~0 coins / shift"
 [node name="FatigueBar" type="HBoxContainer" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+clip_contents = false
 theme_override_constants/separation = 6
 
 [node name="FatigueSegment1" type="ColorRect" parent="VBoxContainer/FatigueBar"]

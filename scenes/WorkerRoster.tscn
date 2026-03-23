@@ -79,11 +79,13 @@ offset_right = 0.0
 offset_bottom = 280.0
 grow_horizontal = 2
 size_flags_horizontal = 3
+clip_contents = false
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 script = ExtResource("1_u4oqn")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
+clip_contents = false
 theme_override_constants/separation = 8
 
 [node name="RosterTitle" type="Label" parent="VBoxContainer"]
@@ -98,10 +100,12 @@ theme_override_styles/separator = SubResource("StyleBoxLine_separator")
 
 [node name="WorkerList" type="VBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
+clip_contents = false
 theme_override_constants/separation = 10
 
 [node name="WorkerRow_Radek" type="HBoxContainer" parent="VBoxContainer/WorkerList"]
 layout_mode = 2
+clip_contents = false
 theme_override_constants/separation = 8
 
 [node name="Portrait" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Radek"]
@@ -115,6 +119,7 @@ theme_override_styles/texture_normal = SubResource("StyleBoxEmpty_texture")
 [node name="InfoColumn" type="VBoxContainer" parent="VBoxContainer/WorkerList/WorkerRow_Radek"]
 layout_mode = 2
 size_flags_horizontal = 3
+clip_contents = false
 theme_override_constants/separation = 4
 
 [node name="NameLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Radek/InfoColumn"]
@@ -130,6 +135,7 @@ text = "Waiting in the roster"
 
 [node name="StatsRow" type="HBoxContainer" parent="VBoxContainer/WorkerList/WorkerRow_Radek/InfoColumn"]
 layout_mode = 2
+clip_contents = false
 theme_override_constants/separation = 10
 
 [node name="SkillIcon" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Radek/InfoColumn/StatsRow"]
@@ -183,6 +189,7 @@ text = "Rest today"
 
 [node name="WorkerRow_Bozena" type="HBoxContainer" parent="VBoxContainer/WorkerList"]
 layout_mode = 2
+clip_contents = false
 theme_override_constants/separation = 8
 
 [node name="Portrait" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Bozena"]
@@ -196,6 +203,7 @@ theme_override_styles/texture_normal = SubResource("StyleBoxEmpty_texture")
 [node name="InfoColumn" type="VBoxContainer" parent="VBoxContainer/WorkerList/WorkerRow_Bozena"]
 layout_mode = 2
 size_flags_horizontal = 3
+clip_contents = false
 theme_override_constants/separation = 4
 
 [node name="NameLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Bozena/InfoColumn"]
@@ -211,6 +219,7 @@ text = "Waiting in the roster"
 
 [node name="StatsRow" type="HBoxContainer" parent="VBoxContainer/WorkerList/WorkerRow_Bozena/InfoColumn"]
 layout_mode = 2
+clip_contents = false
 theme_override_constants/separation = 10
 
 [node name="SkillIcon" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Bozena/InfoColumn/StatsRow"]
@@ -264,6 +273,7 @@ text = "Rest today"
 
 [node name="WorkerRow_Jiri" type="HBoxContainer" parent="VBoxContainer/WorkerList"]
 layout_mode = 2
+clip_contents = false
 theme_override_constants/separation = 8
 
 [node name="Portrait" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Jiri"]
@@ -277,6 +287,7 @@ theme_override_styles/texture_normal = SubResource("StyleBoxEmpty_texture")
 [node name="InfoColumn" type="VBoxContainer" parent="VBoxContainer/WorkerList/WorkerRow_Jiri"]
 layout_mode = 2
 size_flags_horizontal = 3
+clip_contents = false
 theme_override_constants/separation = 4
 
 [node name="NameLabel" type="Label" parent="VBoxContainer/WorkerList/WorkerRow_Jiri/InfoColumn"]
@@ -292,6 +303,7 @@ text = "Waiting in the roster"
 
 [node name="StatsRow" type="HBoxContainer" parent="VBoxContainer/WorkerList/WorkerRow_Jiri/InfoColumn"]
 layout_mode = 2
+clip_contents = false
 theme_override_constants/separation = 10
 
 [node name="SkillIcon" type="TextureRect" parent="VBoxContainer/WorkerList/WorkerRow_Jiri/InfoColumn/StatsRow"]
